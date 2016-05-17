@@ -87,7 +87,10 @@ public class GameScreen implements Screen {
     }
 
     public void handleInput(float delta){
-
+        if(Gdx.input.isTouched())
+            player.run();
+        else
+            player.stop();
     }
 
     public TextureAtlas getTextures(){
