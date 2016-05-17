@@ -1,0 +1,12 @@
+
+run_cyc.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+run_cycle
+  rotate: false
+  xy: 1, 1
+  size: 250, 50
+  orig: 250, 50
+  offset: 0, 0
+  index: -1
