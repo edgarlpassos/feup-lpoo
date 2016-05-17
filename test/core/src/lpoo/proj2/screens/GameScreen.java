@@ -89,7 +89,7 @@ public class GameScreen implements Screen {
     public void handleInput(float delta){
         if(Gdx.input.isTouched())
             player.run();
-        else
+        else if (player.getCurrentState() != Player.State.STOP)
             player.stop();
     }
 

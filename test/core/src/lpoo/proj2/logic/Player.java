@@ -22,7 +22,7 @@ import lpoo.proj2.screens.GameScreen;
 public class Player extends Sprite {
 
     public enum State {IDLE, START_RUN, RUNNING, STOP, TURNING, TURNING_RUN, RUN_JUMP, LONG_JUMP, FALLING,
-        WALKING, DEAD, ATTACKING, DEFENDING, GETTING_SWORD, SWORD_IDLE, DRINKING, CLIMBING, CLIMB_JUMP, DROP, ESCAPING}
+        WALKING, DEAD, ATTACKING, DEFENDING, GETTING_SWORD, STORING_SWORD, SWORD_IDLE, DRINKING, CLIMBING, CLIMB_JUMP, DROP, ESCAPING}
 
     public World world;
     public Body body;
@@ -75,18 +75,35 @@ public class Player extends Sprite {
         setRegion(getFrame(elapsedTime));
         elapsedTime += dt;
         System.out.println(elapsedTime);
+
+        if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.05f)){
+            System.out.println("STOPPING!");
+            body.applyForce(-100f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
+        }
+
+        if(body.getLinearVelocity().isZero(0.05f)){
+            body.setLinearVelocity(0,0);
+        }
     }
 
     public void run(){
-        body.applyLinearImpulse(0.1f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
+        body.applyLinearImpulse(5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
     }
 
     public void stop(){
-        /*while(!body.getLinearVelocity())
-         body.applyLinearImpulse(-2f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);*/
+        previousState = currentState;
+        currentState = State.STOP;
     }
 
     public TextureRegion getFrame(float dt){
         return running.getKeyFrame(dt,true);
+    }
+
+    public State getPreviousState(){
+        return previousState;
+    }
+
+    public State getCurrentState(){
+        return currentState;
     }
 }
