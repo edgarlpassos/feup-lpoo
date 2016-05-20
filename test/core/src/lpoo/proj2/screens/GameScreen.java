@@ -31,7 +31,7 @@ public class GameScreen implements Screen {
 
         cam = new OrthographicCamera();
         vport = new StretchViewport(800,480,cam);
-        textures = new TextureAtlas("run_cyc.pack");
+        textures = new TextureAtlas("sp.pack");
 
         world = new World(new Vector2(0,0),true);
 

@@ -25,12 +25,15 @@ public class Player extends Sprite {
     public Body body;
     private TextureRegion idle;
     private Animation running;
+    private Animation start_run;
     private float elapsedTime;
 
     public Player( GameScreen screen){
-        super(screen.getTextures().findRegion("run_cycle"));
+        super(screen.getTextures().findRegion("playersprites"));
         this.world = screen.getWorld();
         definePlayer();
+
+        //idle sprite
         idle = new TextureRegion(getTexture(),0,0,30,40);
         setBounds(0,0,30,40);
         setRegion(idle);
