@@ -8,11 +8,9 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
-import java.awt.geom.RectangularShape;
 
 import lpoo.proj2.screens.GameScreen;
 
@@ -39,22 +37,34 @@ public class Player extends Sprite {
         this.world = screen.getWorld();
         definePlayer();
 
-         currentState = State.IDLE;
+        currentState = State.IDLE;
         previousState = State.IDLE;
 
+        //idle sprite
         idle = new TextureRegion(getTexture(),0,0,30,40);
         setBounds(0,0,30,40);
         setRegion(idle);
 
-        elapsedTime = 0;
-
         Array<TextureRegion> frames = new Array<TextureRegion>();
-        for(int i = 0; i < 8; i++){
+
+        //start_run animation
+        for(int i = 0; i < 14; i++){
             frames.add(new TextureRegion(getTexture(),(i*30),0,30,40));
         }
+        start_run = new Animation(0.1f,frames);
 
-        running = new Animation(0.1f,frames);
         frames.clear();
+
+        //run cycle animation
+        for(int i = 0; i < 8; i++){
+            frames.add(new TextureRegion(getTexture(),(i*30),42,30,40));
+        }
+        running = new Animation(0.1f,frames);
+
+        frames.clear();
+
+        elapsedTime = 0;
+
     }
 
     public void definePlayer(){
@@ -73,8 +83,7 @@ public class Player extends Sprite {
 
     public void update(float dt){
         setPosition(body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2);
-        setRegion(getFrame(elapsedTime));
-        elapsedTime += dt;
+        setRegion(getFrame(dt));
         System.out.println(elapsedTime);
 
         if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.05f)){
@@ -88,6 +97,17 @@ public class Player extends Sprite {
     }
 
     public void run(){
+        if(currentState == State.START_RUN){
+            previousState = currentState;
+            currentState = State.RUNNING;
+            elapsedTime = 0;
+        }
+
+        else if(currentState != State.RUNNING ){
+            previousState = currentState;
+            currentState = State.START_RUN;
+            elapsedTime = 0;
+        }
         body.applyLinearImpulse(5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
     }
 
@@ -97,7 +117,22 @@ public class Player extends Sprite {
     }
 
     public TextureRegion getFrame(float dt){
-        return running.getKeyFrame(dt,true);
+        if(currentState == State.START_RUN){
+            elapsedTime += dt;
+            return start_run.getKeyFrame(elapsedTime);
+        }
+
+
+        else if (currentState == State.RUNNING){
+            elapsedTime += dt;
+            return running.getKeyFrame(elapsedTime);
+        }
+
+        else if(currentState == State.IDLE){
+            return idle;
+        }
+
+        return idle;
     }
 
     public State getPreviousState(){
@@ -107,4 +142,5 @@ public class Player extends Sprite {
     public State getCurrentState(){
         return currentState;
     }
+
 }
