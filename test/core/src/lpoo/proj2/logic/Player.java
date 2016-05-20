@@ -21,19 +21,27 @@ import lpoo.proj2.screens.GameScreen;
  */
 public class Player extends Sprite {
 
+    public enum State {IDLE, START_RUN, RUNNING, STOP, TURNING, TURNING_RUN, RUN_JUMP, LONG_JUMP, FALLING,
+        WALKING, DEAD, ATTACKING, DEFENDING, GETTING_SWORD, STORING_SWORD, SWORD_IDLE, DRINKING, CLIMBING, CLIMB_JUMP, DROP, ESCAPING}
+
     public World world;
     public Body body;
     private TextureRegion idle;
     private Animation running;
     private Animation start_run;
     private float elapsedTime;
+    private State currentState;
+    private State previousState;
 
     public Player( GameScreen screen){
+
         super(screen.getTextures().findRegion("playersprites"));
         this.world = screen.getWorld();
         definePlayer();
 
-        //idle sprite
+         currentState = State.IDLE;
+        previousState = State.IDLE;
+
         idle = new TextureRegion(getTexture(),0,0,30,40);
         setBounds(0,0,30,40);
         setRegion(idle);
@@ -68,10 +76,35 @@ public class Player extends Sprite {
         setRegion(getFrame(elapsedTime));
         elapsedTime += dt;
         System.out.println(elapsedTime);
-        body.applyLinearImpulse(5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
+
+        if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.05f)){
+            System.out.println("STOPPING!");
+            body.applyForce(-100f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
+        }
+
+        if(body.getLinearVelocity().isZero(0.05f)){
+            body.setLinearVelocity(0,0);
+        }
+    }
+
+    public void run(){
+        body.applyLinearImpulse(5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
+    }
+
+    public void stop(){
+        previousState = currentState;
+        currentState = State.STOP;
     }
 
     public TextureRegion getFrame(float dt){
         return running.getKeyFrame(dt,true);
+    }
+
+    public State getPreviousState(){
+        return previousState;
+    }
+
+    public State getCurrentState(){
+        return currentState;
     }
 }
