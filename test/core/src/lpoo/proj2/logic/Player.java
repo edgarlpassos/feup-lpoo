@@ -27,6 +27,7 @@ public class Player extends Sprite {
     private TextureRegion idle;
     private Animation running;
     private Animation start_run;
+    private Animation stop_run;
     private float elapsedTime;
     private State currentState;
     private State previousState;
@@ -41,7 +42,7 @@ public class Player extends Sprite {
         previousState = State.IDLE;
 
         //idle sprite
-        idle = new TextureRegion(getTexture(),0,0,30,40);
+        idle = new TextureRegion(getTexture(),198,100,39,40);
         setBounds(0,0,30,40);
         setRegion(idle);
 
@@ -52,7 +53,6 @@ public class Player extends Sprite {
             frames.add(new TextureRegion(getTexture(),(i*30),0,30,40));
         }
         start_run = new Animation(0.1f,frames);
-
         frames.clear();
 
         //run cycle animation
@@ -60,9 +60,17 @@ public class Player extends Sprite {
             frames.add(new TextureRegion(getTexture(),(i*33),50,33,40));
         }
         running = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
-
         frames.clear();
 
+
+        //run stop animation
+        for(int i = 0; i < 6; i++){
+            frames.add(new TextureRegion(getTexture(),(i*39),100,39,40));
+        }
+        stop_run = new Animation(0.1f,frames);
+        frames.clear();
+
+        body.setTransform(-400f,0f,0);
         elapsedTime = 0;
 
     }
@@ -87,11 +95,16 @@ public class Player extends Sprite {
         System.out.println(elapsedTime);
 
         if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.05f))
-            body.applyForce(-100f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
+            body.applyLinearImpulse(-5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
 
         if(body.getLinearVelocity().isZero(0.05f)){
             body.setLinearVelocity(0,0);
+            previousState = currentState;
+            currentState = State.IDLE;
+            setRegion(idle);
+            elapsedTime = 0;
         }
+
     }
 
     public void run(){
@@ -115,19 +128,22 @@ public class Player extends Sprite {
     }
 
     public void stop(){
+        if(previousState != State.STOP )
         previousState = currentState;
         currentState = State.STOP;
+        elapsedTime = 0;
     }
 
     public TextureRegion getFrame(float dt){
+
+        elapsedTime += dt;
+
         if(currentState == State.START_RUN){
-            elapsedTime += dt;
             return start_run.getKeyFrame(elapsedTime);
         }
 
 
         else if (currentState == State.RUNNING){
-            elapsedTime += dt;
             return running.getKeyFrame(elapsedTime);
         }
 
@@ -135,6 +151,9 @@ public class Player extends Sprite {
             return idle;
         }
 
+        else if(currentState == State.STOP){
+            return stop_run.getKeyFrame(elapsedTime);
+        }
         return idle;
     }
 

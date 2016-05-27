@@ -10,7 +10,6 @@ import lpoo.proj2.screens.*;
 public class lpooGame extends Game {
 
 	public SpriteBatch batch;
-
 	
 	@Override
 	public void create () {
