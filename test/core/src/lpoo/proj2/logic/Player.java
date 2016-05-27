@@ -57,9 +57,9 @@ public class Player extends Sprite {
 
         //run cycle animation
         for(int i = 0; i < 8; i++){
-            frames.add(new TextureRegion(getTexture(),(i*30),42,30,40));
+            frames.add(new TextureRegion(getTexture(),(i*33),50,33,40));
         }
-        running = new Animation(0.1f,frames);
+        running = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
 
         frames.clear();
 
@@ -86,10 +86,8 @@ public class Player extends Sprite {
         setRegion(getFrame(dt));
         System.out.println(elapsedTime);
 
-        if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.05f)){
-            System.out.println("STOPPING!");
+        if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.05f))
             body.applyForce(-100f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
-        }
 
         if(body.getLinearVelocity().isZero(0.05f)){
             body.setLinearVelocity(0,0);
@@ -98,9 +96,14 @@ public class Player extends Sprite {
 
     public void run(){
         if(currentState == State.START_RUN){
-            previousState = currentState;
-            currentState = State.RUNNING;
-            elapsedTime = 0;
+                if(start_run.isAnimationFinished(elapsedTime)) {
+                    previousState = currentState;
+                    currentState = State.RUNNING;
+                    elapsedTime = 0;
+                }
+
+            else
+                 body.applyLinearImpulse(1.0f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
         }
 
         else if(currentState != State.RUNNING ){
@@ -108,7 +111,7 @@ public class Player extends Sprite {
             currentState = State.START_RUN;
             elapsedTime = 0;
         }
-        body.applyLinearImpulse(5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
+        body.applyLinearImpulse(4f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
     }
 
     public void stop(){
