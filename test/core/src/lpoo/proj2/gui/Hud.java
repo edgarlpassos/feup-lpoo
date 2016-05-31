@@ -1,9 +1,13 @@
 package lpoo.proj2.gui;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -13,6 +17,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import lpoo.proj2.*;
+import lpoo.proj2.screens.GameScreen;
+
 
 /**
  * Created by epassos on 5/31/16.
@@ -22,16 +28,20 @@ public class Hud {
     public Stage stage;
     public Viewport viewport;
 
-    private Button buttonA;
+    private GameScreen screen;
+
+    public Button buttonA;
     private Button buttonB;
     private Button walkButton;
     private Button leftButton;
     private Button rightButton;
 
-    public Hud(SpriteBatch batch){
+    public Hud(SpriteBatch batch, final GameScreen screen){
 
+        this.screen = screen;
         viewport = new FitViewport(lpooGame.WIDTH,lpooGame.HEIGHT,new OrthographicCamera());
         stage = new Stage(viewport,batch);
+        Gdx.input.setInputProcessor(stage);
 
         Table table = new Table();
         table.top();
@@ -60,13 +70,6 @@ public class Hud {
         rightButton = new ImageButton(right,rightPressed);
         walkButton = new ImageButton(walk,walkPressed,walkPressed);
 
-        buttonA.setDisabled(false);
-        buttonB.setDisabled(false);
-        leftButton.setDisabled(false);
-        rightButton.setDisabled(false);
-        walkButton.setDisabled(false);
-
-        table.setDebug(true);
         table.bottom();
         table.left();
         table.add(leftButton).height(40).width(40).padLeft(20);//align(Align.left).fill().pad(0f).space(0f);
@@ -78,7 +81,11 @@ public class Hud {
         table.add(buttonB).height(40).width(40).padRight(20);//.align(Align.right).fill();
 
         stage.addActor(table);
+        table.setDebug(true);
 
+    }
 
+    public void update(float delta){
+        stage.act();
     }
 }

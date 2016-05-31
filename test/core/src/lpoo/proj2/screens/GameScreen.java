@@ -33,24 +33,22 @@ public class GameScreen implements Screen {
     private Hud hud;
 
 
-    Player player;
+    public Player player;
 
 
     public GameScreen(lpooGame game){
         this.game = game;
-
-        cam = new OrthographicCamera();
-        vport = new StretchViewport(800,480,cam);
-        textures = new TextureAtlas("sp.pack");
-        hud = new Hud(game.batch);
-        world = new World(new Vector2(0,0),true);
-
-        player = new Player(this);
         }
 
     @Override
     public void show() {
-
+        System.out.println("HI");
+        cam = new OrthographicCamera();
+        vport = new StretchViewport(800,480,cam);
+        textures = new TextureAtlas("sp.pack");
+        hud = new Hud(game.batch,this);
+        world = new World(new Vector2(0,0),true);
+        player = new Player(this);
     }
 
     @Override
@@ -60,9 +58,10 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
-        game.batch.begin();
+        /*game.batch.begin();
         player.draw(game.batch);
         game.batch.end();
+*/
         hud.stage.draw();
     }
 
@@ -93,19 +92,20 @@ public class GameScreen implements Screen {
 
     public void update(float delta) {
         handleInput();
+        hud.update(delta);
         player.update(delta);
 
         world.step(1/60f,6,2);
     }
 
     public void handleInput(){
-        if(Gdx.input.isTouched())
+       /* if(Gdx.input.isTouched())
             player.run();
 
         else if(Gdx.input.isKeyPressed(Input.Keys.SPACE))
             player.jump();
 
-        else if (player.getCurrentState() != Player.State.STOP)
+        else*/ if (player.getCurrentState() != Player.State.STOP)
             player.stop();
     }
 

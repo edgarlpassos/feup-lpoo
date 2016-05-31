@@ -102,7 +102,7 @@ public class Player extends Sprite {
     public void update(float dt){
         setPosition(body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2);
         setRegion(getFrame(dt));
-        System.out.println(elapsedTime);
+       // System.out.println(elapsedTime);
 
         if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.05f))
             body.applyLinearImpulse(-5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
