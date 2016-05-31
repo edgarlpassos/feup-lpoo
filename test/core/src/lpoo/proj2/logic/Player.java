@@ -174,7 +174,6 @@ public class Player extends Sprite {
         }
 
         else if(currentState == State.RUN_JUMP) {
-            System.out.println("Jumping!!" );
             return running_jump.getKeyFrame(elapsedTime);
         }
         return idle;
@@ -210,7 +209,6 @@ public class Player extends Sprite {
         elapsedTime = 0;
 
         body.applyLinearImpulse(15f,0,body.getPosition().x - getWidth()/2 ,body.getPosition().y - getHeight()/2,true);
-
     }
 
     public State getPreviousState(){
