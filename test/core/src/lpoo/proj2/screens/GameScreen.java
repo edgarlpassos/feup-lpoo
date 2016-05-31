@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import lpoo.proj2.*;
+import lpoo.proj2.gui.Hud;
 import lpoo.proj2.logic.Player;
 
 /**
@@ -29,11 +30,8 @@ public class GameScreen implements Screen {
     private OrthographicCamera cam;
     private Viewport vport;
     private TextureAtlas textures;
-    private Button buttonA;
-    private Button buttonB;
-    private Button walkButton;
-    private Button leftButton;
-    private Button rightButton;
+    private Hud hud;
+
 
     Player player;
 
@@ -44,33 +42,11 @@ public class GameScreen implements Screen {
         cam = new OrthographicCamera();
         vport = new StretchViewport(800,480,cam);
         textures = new TextureAtlas("sp.pack");
-
+        hud = new Hud(game.batch);
         world = new World(new Vector2(0,0),true);
 
         player = new Player(this);
-        TextureRegionDrawable aBtn = new TextureRegionDrawable(new TextureRegion(new Texture("gui/a.png")));
-        TextureRegionDrawable aBtnPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/a_pressed.png")));
-
-        TextureRegionDrawable bBtn = new TextureRegionDrawable(new TextureRegion(new Texture("gui/b.png")));
-        TextureRegionDrawable bBtnPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/b_pressed.png")));
-
-        TextureRegionDrawable left = new TextureRegionDrawable(new TextureRegion(new Texture("gui/left.png")));
-        TextureRegionDrawable leftPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/left_pressed.png")));
-
-        TextureRegionDrawable right = new TextureRegionDrawable(new TextureRegion(new Texture("gui/right.png")));
-        TextureRegionDrawable rightPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/right_pressed.png")));
-
-        TextureRegionDrawable walk = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk.png")));
-        TextureRegionDrawable walkPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk_pressed.png")));
-
-
-        buttonA = new ImageButton(aBtn,aBtnPressed);
-        buttonB = new ImageButton(bBtn,bBtnPressed);
-        leftButton = new ImageButton(left,leftPressed);
-        rightButton = new ImageButton(right,rightPressed);
-        walkButton = new ImageButton(walk,walkPressed,walkPressed);
-
-    }
+        }
 
     @Override
     public void show() {
@@ -83,16 +59,11 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        game.batch.setProjectionMatrix(cam.combined);
+        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         game.batch.begin();
-        buttonA.draw(game.batch,0.5f);
-        buttonB.draw(game.batch,0.5f);
-        leftButton.draw(game.batch,0.5f);
-        rightButton.draw(game.batch,0.5f);
-        walkButton.draw(game.batch,0.5f);
-
         player.draw(game.batch);
         game.batch.end();
+        hud.stage.draw();
     }
 
     @Override
