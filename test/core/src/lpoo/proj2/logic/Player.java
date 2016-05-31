@@ -28,6 +28,7 @@ public class Player extends Sprite {
     private Animation running;
     private Animation start_run;
     private Animation stop_run;
+    private Animation running_jump;
     private float elapsedTime;
     private State currentState;
     private State previousState;
@@ -69,6 +70,15 @@ public class Player extends Sprite {
         }
         stop_run = new Animation(0.1f,frames);
         frames.clear();
+
+
+        //running jump animation
+        for(int i = 0; i < 10; i++){
+            frames.add(new TextureRegion(getTexture(),(i*50),150,50,43));
+        }
+        running_jump = new Animation(0.1f,frames);
+        frames.clear();
+
 
         body.setTransform(-400f,0f,0);
         elapsedTime = 0;
@@ -119,6 +129,14 @@ public class Player extends Sprite {
                  body.applyLinearImpulse(1.0f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
         }
 
+        else if(currentState == State.RUN_JUMP){
+            if(running_jump.isAnimationFinished(elapsedTime)){
+                previousState = currentState;
+                currentState = State.RUNNING;
+                elapsedTime = 0;
+            }
+        }
+
         else if(currentState != State.RUNNING ){
             previousState = currentState;
             currentState = State.START_RUN;
@@ -154,7 +172,45 @@ public class Player extends Sprite {
         else if(currentState == State.STOP){
             return stop_run.getKeyFrame(elapsedTime);
         }
+
+        else if(currentState == State.RUN_JUMP) {
+            System.out.println("Jumping!!" );
+            return running_jump.getKeyFrame(elapsedTime);
+        }
         return idle;
+    }
+
+    public void jump(){//TODO different jumps for running and standing
+        /*if(previousState == State.RUNNING){
+            if(running.isAnimationFinished(elapsedTime)){
+                previousState = currentState;
+                currentState = State.RUN_JUMP;
+                elapsedTime = 0;
+
+                body.applyForce(5f,5f,body.getPosition().x,body.getPosition().y,true);
+            }
+
+           else return;
+        }
+
+        if(previousState == State.START_RUN){
+            if(start_run.isAnimationFinished(elapsedTime)){
+                previousState = currentState;
+                currentState = State.RUN_JUMP;
+                elapsedTime = 0;
+
+                body.applyForce(5f,5f,body.getPosition().x,body.getPosition().y,true);
+            }
+
+            else return;
+        }*/
+
+        previousState = currentState;
+        currentState = State.RUN_JUMP;
+        elapsedTime = 0;
+
+        body.applyLinearImpulse(15f,0,body.getPosition().x - getWidth()/2 ,body.getPosition().y - getHeight()/2,true);
+
     }
 
     public State getPreviousState(){

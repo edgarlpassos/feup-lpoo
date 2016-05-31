@@ -1,6 +1,7 @@
 package lpoo.proj2.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -81,15 +82,19 @@ public class GameScreen implements Screen {
     }
 
     public void update(float delta) {
-        handleInput(delta);
+        handleInput();
         player.update(delta);
 
         world.step(1/60f,6,2);
     }
 
-    public void handleInput(float delta){
+    public void handleInput(){
         if(Gdx.input.isTouched())
             player.run();
+
+        else if(Gdx.input.isKeyPressed(Input.Keys.SPACE))
+            player.jump();
+
         else if (player.getCurrentState() != Player.State.STOP)
             player.stop();
     }
