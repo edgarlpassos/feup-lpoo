@@ -102,6 +102,10 @@ public class GameScreen implements Screen {
                 player.walk();
             }
 
+            if(hud.pressedA()){
+                player.jump();
+            }
+
             else player.stop();
         } else {
             if (hud.pressedRight()) {
