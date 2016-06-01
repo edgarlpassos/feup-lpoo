@@ -10,7 +10,8 @@ import lpoo.proj2.screens.*;
 public class lpooGame extends Game {
 
 	public SpriteBatch batch;
-
+	public static final int WIDTH = 800;
+	public static final int HEIGHT = 400;
 	
 	@Override
 	public void create () {
