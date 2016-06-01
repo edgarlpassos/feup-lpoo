@@ -44,7 +44,7 @@ public class Player extends Sprite {
 
         //idle sprite
         idle = new TextureRegion(getTexture(),198,100,39,40);
-        setBounds(0,0,30,40);
+        setBounds(0,0,39,40);
         setRegion(idle);
 
         Array<TextureRegion> frames = new Array<TextureRegion>();
@@ -100,29 +100,33 @@ public class Player extends Sprite {
     }
 
     public void update(float dt){
-       setPosition(body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2);
-       setRegion(getFrame(dt));
-       //System.out.println(elapsedTime); FIXME remove
+        setPosition(body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2);
+        setRegion(getFrame(dt));
+        //System.out.println(elapsedTime); FIXME remove
 
-       //STARTING RUN
-       if(currentState == State.START_RUN)
-            body.applyLinearImpulse(1.0f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
+        //STARTING RUN
+        if(currentState == State.START_RUN)
+           body.applyLinearImpulse(1.0f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
 
-       //RUNNING
-       if(currentState == State.RUNNING)
+        //RUNNING
+        if(currentState == State.RUNNING)
            body.applyLinearImpulse(4f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
 
-       //STOPPING
-       if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.5f))
-            body.applyLinearImpulse(-5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
+        //STOPPING
+        if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.5f))
+           body.applyLinearImpulse(-5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
 
-       if(body.getLinearVelocity().isZero(0.5f)){
+        if(body.getLinearVelocity().isZero(0.5f)){
            body.setLinearVelocity(0,0);
            previousState = currentState;
            currentState = State.IDLE;
            setRegion(idle);
            elapsedTime = 0;
-       }
+        }
+
+        //Running jump
+        if(currentState == State.RUN_JUMP)
+            body.applyLinearImpulse(15f,0,body.getPosition().x - getWidth()/2 ,body.getPosition().y - getHeight()/2,true);
 
     }
 
@@ -194,35 +198,11 @@ public class Player extends Sprite {
     }
 
     public void jump(){//TODO different jumps for running and standing
-        /*if(previousState == State.RUNNING){
-            if(running.isAnimationFinished(elapsedTime)){
-                previousState = currentState;
-                currentState = State.RUN_JUMP;
-                elapsedTime = 0;
-
-                body.applyForce(5f,5f,body.getPosition().x,body.getPosition().y,true);
-            }
-
-           else return;
+        if(currentState == State.RUNNING){
+            previousState = currentState;
+            currentState = State.RUN_JUMP;
+            elapsedTime = 0;
         }
-
-        if(previousState == State.START_RUN){
-            if(start_run.isAnimationFinished(elapsedTime)){
-                previousState = currentState;
-                currentState = State.RUN_JUMP;
-                elapsedTime = 0;
-
-                body.applyForce(5f,5f,body.getPosition().x,body.getPosition().y,true);
-            }
-
-            else return;
-        }*/
-
-        previousState = currentState;
-        currentState = State.RUN_JUMP;
-        elapsedTime = 0;
-
-        body.applyLinearImpulse(15f,0,body.getPosition().x - getWidth()/2 ,body.getPosition().y - getHeight()/2,true);
     }
 
     public State getPreviousState(){

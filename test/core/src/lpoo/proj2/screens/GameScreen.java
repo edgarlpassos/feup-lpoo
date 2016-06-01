@@ -37,9 +37,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        System.out.println("HI");
+        System.out.println("HI"); //FIXME REMOVE
         cam = new OrthographicCamera();
-        vport = new StretchViewport(800,480,cam);
+        vport = new StretchViewport(game.WIDTH,game.HEIGHT,cam);
         textures = new TextureAtlas("sp.pack");
         hud = new Hud(game.batch,this);
         world = new World(new Vector2(0,0),true);
@@ -95,13 +95,29 @@ public class GameScreen implements Screen {
     }
 
     public void handleInput(){
-        if(hud.pressedRight()){
-            if (!hud.walkEnabled())
-                player.run();
+        if(hud.walkEnabled()){
+            //TODO walking animations
         }
 
-       else
-            player.stop();
+        else{
+            if(hud.pressedRight()){
+
+                if(hud.pressedA()) {
+                    System.out.println(player.getCurrentState());
+                    player.jump();
+                }
+
+                else player.run();
+            }
+
+            else if(hud.pressedLeft()){
+                //TODO flip normal animations
+            }
+
+            else player.stop();
+        }
+
+
     }
 
     public TextureAtlas getTextures(){

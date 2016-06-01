@@ -11,7 +11,7 @@ public class lpooGame extends Game {
 
 	public SpriteBatch batch;
 	public static final int WIDTH = 800;
-	public static final int HEIGHT = 400;
+	public static final int HEIGHT = 480;
 	
 	@Override
 	public void create () {
