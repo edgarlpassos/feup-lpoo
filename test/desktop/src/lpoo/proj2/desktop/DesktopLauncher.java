@@ -8,6 +8,8 @@ public class DesktopLauncher {
 
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.width = lpooGame.WIDTH;
+		config.height = lpooGame.HEIGHT;
 		new LwjglApplication(new lpooGame(), config);
 	}
 }
