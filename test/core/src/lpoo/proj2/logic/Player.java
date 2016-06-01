@@ -53,7 +53,7 @@ public class Player extends Sprite {
         for(int i = 0; i < 14; i++){
             frames.add(new TextureRegion(getTexture(),(i*30),0,30,40));
         }
-        start_run = new Animation(0.1f,frames);
+        start_run = new Animation(0.05f,frames);
         frames.clear();
 
         //run cycle animation
@@ -68,7 +68,7 @@ public class Player extends Sprite {
         for(int i = 0; i < 6; i++){
             frames.add(new TextureRegion(getTexture(),(i*39),100,39,40));
         }
-        stop_run = new Animation(0.1f,frames);
+        stop_run = new Animation(0.05f,frames);
         frames.clear();
 
 
@@ -100,20 +100,29 @@ public class Player extends Sprite {
     }
 
     public void update(float dt){
-        setPosition(body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2);
-        setRegion(getFrame(dt));
-       // System.out.println(elapsedTime);
+       setPosition(body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2);
+       setRegion(getFrame(dt));
+       //System.out.println(elapsedTime); FIXME remove
 
-        if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.05f))
+       //STARTING RUN
+       if(currentState == State.START_RUN)
+            body.applyLinearImpulse(1.0f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
+
+       //RUNNING
+       if(currentState == State.RUNNING)
+           body.applyLinearImpulse(4f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
+
+       //STOPPING
+       if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.5f))
             body.applyLinearImpulse(-5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
 
-        if(body.getLinearVelocity().isZero(0.05f)){
-            body.setLinearVelocity(0,0);
-            previousState = currentState;
-            currentState = State.IDLE;
-            setRegion(idle);
-            elapsedTime = 0;
-        }
+       if(body.getLinearVelocity().isZero(0.5f)){
+           body.setLinearVelocity(0,0);
+           previousState = currentState;
+           currentState = State.IDLE;
+           setRegion(idle);
+           elapsedTime = 0;
+       }
 
     }
 
@@ -124,9 +133,6 @@ public class Player extends Sprite {
                     currentState = State.RUNNING;
                     elapsedTime = 0;
                 }
-
-            else
-                 body.applyLinearImpulse(1.0f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
         }
 
         else if(currentState == State.RUN_JUMP){
@@ -142,11 +148,19 @@ public class Player extends Sprite {
             currentState = State.START_RUN;
             elapsedTime = 0;
         }
-        body.applyLinearImpulse(4f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
     }
 
     public void stop(){
-        if(previousState != State.STOP )
+
+        if(previousState == State.START_RUN){
+            if(start_run.isAnimationFinished(elapsedTime)){
+                previousState = currentState;
+                currentState = State.STOP;
+                elapsedTime = 0;
+            }
+        }
+
+        else if(previousState != State.STOP )
         previousState = currentState;
         currentState = State.STOP;
         elapsedTime = 0;

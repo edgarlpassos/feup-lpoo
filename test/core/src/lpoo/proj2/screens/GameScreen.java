@@ -5,14 +5,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -58,11 +53,12 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
-        /*game.batch.begin();
+
+        game.batch.begin();
         player.draw(game.batch);
         game.batch.end();
-*/
-        hud.stage.draw();
+
+        hud.getStage().draw();
     }
 
     @Override
@@ -99,13 +95,12 @@ public class GameScreen implements Screen {
     }
 
     public void handleInput(){
-       /* if(Gdx.input.isTouched())
-            player.run();
+        if(hud.pressedRight()){
+            if (!hud.walkEnabled())
+                player.run();
+        }
 
-        else if(Gdx.input.isKeyPressed(Input.Keys.SPACE))
-            player.jump();
-
-        else*/ if (player.getCurrentState() != Player.State.STOP)
+       else
             player.stop();
     }
 

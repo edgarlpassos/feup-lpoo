@@ -30,7 +30,7 @@ public class Hud {
 
     private GameScreen screen;
 
-    public Button buttonA;
+    private Button buttonA;
     private Button buttonB;
     private Button walkButton;
     private Button leftButton;
@@ -47,7 +47,7 @@ public class Hud {
         table.top();
         table.setFillParent(true);
 
-
+        //gui buttons
         TextureRegionDrawable aBtn = new TextureRegionDrawable(new TextureRegion(new Texture("gui/a.png")));
         TextureRegionDrawable aBtnPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/a_pressed.png")));
 
@@ -70,6 +70,7 @@ public class Hud {
         rightButton = new ImageButton(right,rightPressed);
         walkButton = new ImageButton(walk,walkPressed,walkPressed);
 
+        //placing the buttons
         table.bottom();
         table.left();
         table.add(leftButton).height(40).width(40).padLeft(20);//align(Align.left).fill().pad(0f).space(0f);
@@ -81,11 +82,34 @@ public class Hud {
         table.add(buttonB).height(40).width(40).padRight(20);//.align(Align.right).fill();
 
         stage.addActor(table);
-        table.setDebug(true);
-
+        table.setDebug(true);   //TODO remove later
     }
 
     public void update(float delta){
         stage.act();
+    }
+
+    public boolean pressedA(){
+        return buttonA.isPressed();
+    }
+
+    public boolean pressedB(){
+        return buttonB.isPressed();
+    }
+
+    public boolean pressedLeft(){
+        return leftButton.isPressed();
+    }
+
+    public boolean pressedRight(){
+        return rightButton.isPressed();
+    }
+
+    public boolean walkEnabled(){
+        return walkButton.isChecked();
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 }
