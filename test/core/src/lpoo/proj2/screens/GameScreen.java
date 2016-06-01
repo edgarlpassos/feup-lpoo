@@ -31,18 +31,18 @@ public class GameScreen implements Screen {
     public Player player;
 
 
-    public GameScreen(lpooGame game){
+    public GameScreen(lpooGame game) {
         this.game = game;
-        }
+    }
 
     @Override
     public void show() {
         System.out.println("HI"); //FIXME REMOVE
         cam = new OrthographicCamera();
-        vport = new StretchViewport(game.WIDTH,game.HEIGHT,cam);
+        vport = new StretchViewport(game.WIDTH, game.HEIGHT, cam);
         textures = new TextureAtlas("sp.pack");
-        hud = new Hud(game.batch,this);
-        world = new World(new Vector2(0,0),true);
+        hud = new Hud(game.batch, this);
+        world = new World(new Vector2(0, 0), true);
         player = new Player(this);
     }
 
@@ -52,18 +52,19 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
 
+        game.batch.setProjectionMatrix(vport.getCamera().combined);
         game.batch.begin();
         player.draw(game.batch);
         game.batch.end();
 
+        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.getStage().draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        vport.update(width,height);
+        vport.update(width, height);
     }
 
     @Override
@@ -91,39 +92,37 @@ public class GameScreen implements Screen {
         hud.update(delta);
         player.update(delta);
 
-        world.step(1/60f,6,2);
+        world.step(1 / 60f, 6, 2);
     }
 
-    public void handleInput(){
-        if(hud.walkEnabled()){
+    public void handleInput() {
+        if (hud.walkEnabled()) {
             //TODO walking animations
-        }
-
-        else{
             if(hud.pressedRight()){
-
-                if(hud.pressedA()) {
-                    System.out.println(player.getCurrentState());
-                    player.jump();
-                }
-
-                else player.run();
-            }
-
-            else if(hud.pressedLeft()){
-                //TODO flip normal animations
+                player.walk();
             }
 
             else player.stop();
+        } else {
+            if (hud.pressedRight()) {
+
+                if (hud.pressedA()) {
+                    System.out.println(player.getCurrentState());
+                    player.jump();
+                } else player.run();
+            } else if (hud.pressedLeft()) {
+                //TODO flip normal animations
+            } else player.stop();
         }
 
 
     }
 
-    public TextureAtlas getTextures(){
+    public TextureAtlas getTextures() {
         return textures;
     }
-    public World getWorld(){
+
+    public World getWorld() {
         return world;
     }
 }

@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
 import lpoo.proj2.*;
 import lpoo.proj2.screens.GameScreen;
 
@@ -36,11 +37,11 @@ public class Hud {
     private Button leftButton;
     private Button rightButton;
 
-    public Hud(SpriteBatch batch, final GameScreen screen){
+    public Hud(SpriteBatch batch, final GameScreen screen) {
 
         this.screen = screen;
-        viewport = new FitViewport(lpooGame.WIDTH,lpooGame.HEIGHT,new OrthographicCamera());
-        stage = new Stage(viewport,batch);
+        viewport = new FitViewport(lpooGame.WIDTH, lpooGame.HEIGHT, new OrthographicCamera());
+        stage = new Stage(viewport, batch);
         Gdx.input.setInputProcessor(stage);
 
         Table table = new Table();
@@ -64,11 +65,11 @@ public class Hud {
         TextureRegionDrawable walkPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk_pressed.png")));
 
 
-        buttonA = new ImageButton(aBtn,aBtnPressed);
-        buttonB = new ImageButton(bBtn,bBtnPressed);
-        leftButton = new ImageButton(left,leftPressed);
-        rightButton = new ImageButton(right,rightPressed);
-        walkButton = new ImageButton(walk,walkPressed,walkPressed);
+        buttonA = new ImageButton(aBtn, aBtnPressed);
+        buttonB = new ImageButton(bBtn, bBtnPressed);
+        leftButton = new ImageButton(left, leftPressed);
+        rightButton = new ImageButton(right, rightPressed);
+        walkButton = new ImageButton(walk, walkPressed, walkPressed);
 
         //placing the buttons
         table.bottom();
@@ -85,27 +86,27 @@ public class Hud {
         table.setDebug(true);   //TODO remove later
     }
 
-    public void update(float delta){
+    public void update(float delta) {
         stage.act();
     }
 
-    public boolean pressedA(){
+    public boolean pressedA() {
         return buttonA.isPressed();
     }
 
-    public boolean pressedB(){
+    public boolean pressedB() {
         return buttonB.isPressed();
     }
 
-    public boolean pressedLeft(){
+    public boolean pressedLeft() {
         return leftButton.isPressed();
     }
 
-    public boolean pressedRight(){
+    public boolean pressedRight() {
         return rightButton.isPressed();
     }
 
-    public boolean walkEnabled(){
+    public boolean walkEnabled() {
         return walkButton.isChecked();
     }
 

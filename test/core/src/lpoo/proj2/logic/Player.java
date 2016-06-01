@@ -19,8 +19,10 @@ import lpoo.proj2.screens.GameScreen;
  */
 public class Player extends Sprite {
 
-    public enum State {IDLE, START_RUN, RUNNING, STOP, TURNING, TURNING_RUN, RUN_JUMP, LONG_JUMP, FALLING,
-        WALKING, DEAD, ATTACKING, DEFENDING, GETTING_SWORD, STORING_SWORD, SWORD_IDLE, DRINKING, CLIMBING, CLIMB_JUMP, DROP, ESCAPING}
+    public enum State {
+        IDLE, START_RUN, RUNNING, STOP,TURNING, TURNING_RUN, RUN_JUMP, LONG_JUMP, FALLING,
+        WALKING, DEAD, ATTACKING, DEFENDING, GETTING_SWORD, STORING_SWORD, SWORD_IDLE, DRINKING, CLIMBING, CLIMB_JUMP, DROP, ESCAPING
+    }
 
     public World world;
     public Body body;
@@ -29,11 +31,12 @@ public class Player extends Sprite {
     private Animation start_run;
     private Animation stop_run;
     private Animation running_jump;
+    private Animation walking;
     private float elapsedTime;
     private State currentState;
     private State previousState;
 
-    public Player( GameScreen screen){
+    public Player(GameScreen screen) {
 
         super(screen.getTextures().findRegion("playersprites"));
         this.world = screen.getWorld();
@@ -43,51 +46,58 @@ public class Player extends Sprite {
         previousState = State.IDLE;
 
         //idle sprite
-        idle = new TextureRegion(getTexture(),198,100,39,40);
-        setBounds(0,0,39,40);
+        idle = new TextureRegion(getTexture(), 198, 100, 39, 40);
+        setBounds(0, 0, 39, 40);
         setRegion(idle);
 
         Array<TextureRegion> frames = new Array<TextureRegion>();
 
         //start_run animation
-        for(int i = 0; i < 14; i++){
-            frames.add(new TextureRegion(getTexture(),(i*30),0,30,40));
+        for (int i = 0; i < 14; i++) {
+            frames.add(new TextureRegion(getTexture(), (i * 30), 0, 30, 40));
         }
-        start_run = new Animation(0.05f,frames);
+        start_run = new Animation(0.1f, frames);
         frames.clear();
 
         //run cycle animation
-        for(int i = 0; i < 8; i++){
-            frames.add(new TextureRegion(getTexture(),(i*33),50,33,40));
+        for (int i = 0; i < 8; i++) {
+            frames.add(new TextureRegion(getTexture(), (i * 33), 50, 33, 40));
         }
-        running = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
+        running = new Animation(0.1f, frames, Animation.PlayMode.LOOP);
         frames.clear();
 
 
         //run stop animation
-        for(int i = 0; i < 6; i++){
-            frames.add(new TextureRegion(getTexture(),(i*39),100,39,40));
+        for (int i = 0; i < 6; i++) {
+            frames.add(new TextureRegion(getTexture(), (i * 39), 100, 39, 40));
         }
-        stop_run = new Animation(0.05f,frames);
+        stop_run = new Animation(0.1f, frames);
         frames.clear();
 
 
         //running jump animation
-        for(int i = 0; i < 10; i++){
-            frames.add(new TextureRegion(getTexture(),(i*50),150,50,43));
+        for (int i = 0; i < 10; i++) {
+            frames.add(new TextureRegion(getTexture(), (i * 50), 150, 50, 43));
         }
-        running_jump = new Animation(0.1f,frames);
+        running_jump = new Animation(0.1f, frames);
         frames.clear();
 
 
-        body.setTransform(-400f,0f,0);
+        //walking animation
+        for (int i = 0; i < 8; i++){
+            frames.add(new TextureRegion(getTexture(),i*40,200,40,40));
+        }
+        walking = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
+        frames.clear();
+
+        body.setTransform(-400f, 0f, 0);
         elapsedTime = 0;
 
     }
 
-    public void definePlayer(){
+    public void definePlayer() {
         BodyDef bdef = new BodyDef();
-        bdef.position.set(0,0);
+        bdef.position.set(0, 0);
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
 
@@ -99,117 +109,130 @@ public class Player extends Sprite {
         body.createFixture(fdef);
     }
 
-    public void update(float dt){
-        setPosition(body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2);
+    public void update(float dt) {
+        setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
         setRegion(getFrame(dt));
         //System.out.println(elapsedTime); FIXME remove
 
         //STARTING RUN
-        if(currentState == State.START_RUN)
-           body.applyLinearImpulse(1.0f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
+        if (currentState == State.START_RUN)
+            body.applyLinearImpulse(1f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true); //FIXME adjust speed
 
         //RUNNING
-        if(currentState == State.RUNNING)
-           body.applyLinearImpulse(4f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true); //FIXME adjust speed
+        if (currentState == State.RUNNING)
+            body.applyLinearImpulse(4f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true); //FIXME adjust speed
 
         //STOPPING
-        if(currentState == State.STOP && !body.getLinearVelocity().isZero(0.5f))
-           body.applyLinearImpulse(-5f,0f,body.getPosition().x - getWidth()/2, body.getPosition().y - getHeight() / 2,true);
+        if (currentState == State.STOP && !body.getLinearVelocity().isZero(0.5f) )
+            body.applyLinearImpulse(-5f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
 
-        if(body.getLinearVelocity().isZero(0.5f)){
-           body.setLinearVelocity(0,0);
-           previousState = currentState;
-           currentState = State.IDLE;
-           setRegion(idle);
-           elapsedTime = 0;
-        }
-
-        //Running jump
-        if(currentState == State.RUN_JUMP)
-            body.applyLinearImpulse(15f,0,body.getPosition().x - getWidth()/2 ,body.getPosition().y - getHeight()/2,true);
-
-    }
-
-    public void run(){
-        if(currentState == State.START_RUN){
-                if(start_run.isAnimationFinished(elapsedTime)) {
-                    previousState = currentState;
-                    currentState = State.RUNNING;
-                    elapsedTime = 0;
-                }
-        }
-
-        else if(currentState == State.RUN_JUMP){
-            if(running_jump.isAnimationFinished(elapsedTime)){
+        if (body.getLinearVelocity().isZero(0.5f)) {
+            if(currentState == State.STOP && stop_run.isAnimationFinished(elapsedTime)) {
+                body.setLinearVelocity(0, 0);
                 previousState = currentState;
-                currentState = State.RUNNING;
+                currentState = State.IDLE;
+                setRegion(idle);
                 elapsedTime = 0;
             }
         }
 
-        else if(currentState != State.RUNNING ){
+        //Running jump
+        if (currentState == State.RUN_JUMP)
+            body.applyLinearImpulse(15f, 0, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
+
+        //Walking
+        if(currentState == State.WALKING)
+            body.applyLinearImpulse(1f,0f,body.getWorldCenter().x,body.getWorldCenter().y,true);
+
+    }
+
+    public void run() {
+        if (currentState == State.START_RUN) {
+            if (start_run.isAnimationFinished(elapsedTime)) {
+                previousState = currentState;
+                currentState = State.RUNNING;
+                elapsedTime = 0;
+            }
+        } else if (currentState == State.RUN_JUMP) {
+            if (running_jump.isAnimationFinished(elapsedTime)) {
+                previousState = currentState;
+                currentState = State.RUNNING;
+                elapsedTime = 0;
+            }
+        } else if (currentState != State.RUNNING) {
             previousState = currentState;
             currentState = State.START_RUN;
             elapsedTime = 0;
         }
     }
 
-    public void stop(){
 
-        if(previousState == State.START_RUN){
-            if(start_run.isAnimationFinished(elapsedTime)){
+    public void stop() {
+
+        if (currentState == State.START_RUN) {
+            if (start_run.isAnimationFinished(elapsedTime)) {
                 previousState = currentState;
                 currentState = State.STOP;
                 elapsedTime = 0;
             }
         }
 
-        else if(previousState != State.STOP )
-        previousState = currentState;
-        currentState = State.STOP;
-        elapsedTime = 0;
+        else if (currentState == State.WALKING){
+            if(walking.isAnimationFinished(elapsedTime)){
+                previousState = currentState;
+                body.setLinearVelocity(0f,0f);
+                currentState = State.IDLE;
+                elapsedTime = 0;
+            }
+        }
+        else if (currentState == State.RUNNING){
+            previousState = currentState;
+            currentState = State.STOP;
+            elapsedTime = 0;
+        }
     }
 
-    public TextureRegion getFrame(float dt){
+    public TextureRegion getFrame(float dt) {
 
         elapsedTime += dt;
 
-        if(currentState == State.START_RUN){
+        if (currentState == State.START_RUN) {
             return start_run.getKeyFrame(elapsedTime);
-        }
-
-
-        else if (currentState == State.RUNNING){
+        } else if (currentState == State.RUNNING) {
             return running.getKeyFrame(elapsedTime);
-        }
-
-        else if(currentState == State.IDLE){
+        } else if (currentState == State.IDLE) {
             return idle;
-        }
-
-        else if(currentState == State.STOP){
+        } else if (currentState == State.STOP) {
             return stop_run.getKeyFrame(elapsedTime);
-        }
-
-        else if(currentState == State.RUN_JUMP) {
+        } else if (currentState == State.RUN_JUMP) {
             return running_jump.getKeyFrame(elapsedTime);
+        } else if (currentState == State.WALKING){
+            return walking.getKeyFrame(elapsedTime);
         }
         return idle;
     }
 
-    public void jump(){//TODO different jumps for running and standing
-        if(currentState == State.RUNNING){
+    public void jump() {//TODO different jumps for running and standing
+        if (currentState == State.RUNNING) {
             previousState = currentState;
             currentState = State.RUN_JUMP;
             elapsedTime = 0;
         }
     }
 
-    public State getPreviousState(){
+    public void walk(){
+        if(currentState != State.WALKING){
+            previousState = currentState;
+            currentState = State.WALKING;
+            elapsedTime = 0;
+        }
+    }
+
+    public State getPreviousState() {
         return previousState;
     }
 
-    public State getCurrentState(){
+    public State getCurrentState() {
         return currentState;
     }
 
