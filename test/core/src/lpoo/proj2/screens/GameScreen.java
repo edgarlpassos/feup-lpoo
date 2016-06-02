@@ -58,6 +58,8 @@ public class GameScreen implements Screen {
         player.draw(game.batch);
         game.batch.end();
 
+        System.out.println(player.getCurrentState());
+
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.getStage().draw();
     }
@@ -96,36 +98,51 @@ public class GameScreen implements Screen {
     }
 
     public void handleInput() {
+
+        //Walking animations
         if (hud.walkEnabled()) {
-            //TODO walking animations
-            if(hud.pressedRight()){
-                if(player.isFacingRight())
+            if (hud.pressedA()) {   //long jump
+                player.jump();
+            }
+
+            else if (hud.pressedRight()) {
+                if (player.isFacingRight())
                     player.walk();
+                //facing left, turn around
+                else player.turn();
             }
+            else if (hud.pressedLeft()) {
+                if (!player.isFacingRight()) {
+                    player.walk();
+                //facing right, turn around
+                } else player.turn();
 
-            if(hud.pressedLeft()){
+            } else player.stop();
+
+        //Running animations
+        } else {
+            if (hud.pressedRight()) {
                 if(player.isFacingRight()){
-                    player.turn();
-                }
+                    if(hud.pressedA())
+                        player.jump();
 
-                else player.walk();
+                    else player.run();
+                //facing left, turn  around
+                } else {/*TODO turning run*/}
             }
 
-            if(hud.pressedA()){
-                player.jump(); //TODO facing left
+            else if(hud.pressedLeft()){
+                if(!player.isFacingRight()) {
+                    if (hud.pressedA())
+                        player.jump();
+                    else player.run();
+                }
+                //facing right, turn around
+                else {/*TODO turning run*/}
+
             }
 
             else player.stop();
-        } else {
-            if (hud.pressedRight() && player.isFacingRight()) {
-
-                if (hud.pressedA()) {
-                    System.out.println(player.getCurrentState());
-                    player.jump();
-                } else player.run();
-            } else if (hud.pressedLeft()) {
-                //TODO flip normal animations
-            } else player.stop();
         }
 
 

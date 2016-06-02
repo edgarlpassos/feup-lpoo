@@ -108,7 +108,7 @@ public class Player extends Sprite {
         for (int i = 0; i < 6; i++) {
             frames.add(new TextureRegion(getTexture(), i * 50, 300, 50, 40));
         }
-        turn = new Animation(0.12f, frames);
+        turn = new Animation(0.1f, frames);
         frames.clear();
 
         body.setTransform(-400f, 0f, 0);
@@ -134,19 +134,21 @@ public class Player extends Sprite {
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
         setRegion(getFrame(dt));
 
-        //System.out.println(elapsedTime); FIXME remove
+        int direction = facingRight ? 1 : -1;
+
+        //System.out.println(elapsedTime); FIXME remove2
 
         //STARTING RUN
         if (currentState == State.START_RUN)
-            body.applyLinearImpulse(1f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true); //FIXME adjust speed
+            body.applyLinearImpulse(direction * 1f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true); //FIXME adjust speed
 
         //RUNNING
         if (currentState == State.RUNNING)
-            body.applyLinearImpulse(4f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true); //FIXME adjust speed
+            body.applyLinearImpulse(direction * 4f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true); //FIXME adjust speed
 
         //STOPPING
         if (currentState == State.STOP && !body.getLinearVelocity().isZero(0.5f))
-            body.applyLinearImpulse(-5f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
+            body.applyLinearImpulse(direction * -5f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
 
         if (body.getLinearVelocity().isZero(0.5f)) {
             if ((currentState == State.STOP && stop_run.isAnimationFinished(elapsedTime)) || currentState == State.TURNING && turn.isAnimationFinished(elapsedTime)) {
@@ -157,24 +159,20 @@ public class Player extends Sprite {
 
         //Running jump
         if (currentState == State.RUN_JUMP)
-            body.applyLinearImpulse(15f, 0, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
+            body.applyLinearImpulse(direction * 15f, 0, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
 
         //Walking
         if (currentState == State.WALKING)
-            body.applyLinearImpulse(1f, 0f, body.getWorldCenter().x, body.getWorldCenter().y, true);
+            body.applyLinearImpulse(direction * 1f, 0f, body.getWorldCenter().x, body.getWorldCenter().y, true);
 
         //Long jump
         if (currentState == State.LONG_JUMP) {
             if (elapsedTime > 0.5f && elapsedTime < 1f)
-                body.applyForceToCenter(100000f, 0f, true);
+                body.applyForceToCenter(direction * 100000f, 0f, true);
         }
 
         //turning
-        if (currentState == State.TURNING && !body.getLinearVelocity().isZero(0.5f)) {
-            if (!facingRight)
-                body.applyForceToCenter(-5f, 0, true);
-
-            else body.applyForceToCenter(5f, 0, true);
+        if (currentState == State.TURNING ) {
         }
 
     }
@@ -220,6 +218,14 @@ public class Player extends Sprite {
                 changeState(State.IDLE);
                 body.setLinearVelocity(0f, 0f);
             }
+        } else if(currentState == State.RUN_JUMP){
+            if (running_jump.isAnimationFinished(elapsedTime)){
+                changeState(State.STOP);
+            }
+        }
+
+        else if (currentState != State.STOP){
+            changeState(State.IDLE);
         }
 
     }
@@ -279,7 +285,7 @@ public class Player extends Sprite {
             }
         }
 
-        if (currentState != State.WALKING) {
+        else if (currentState != State.WALKING) {
             changeState(State.WALKING);
         }
     }
@@ -288,15 +294,11 @@ public class Player extends Sprite {
         if (currentState == State.WALKING) {
             if (walking.isAnimationFinished(elapsedTime)) {
                 changeState(State.TURNING);
-                if (facingRight)
-                    facingRight = false;
-                else facingRight = true;
+                facingRight = !facingRight;
             }
         } else if (currentState == State.IDLE) {
             changeState(State.TURNING);
-            if (facingRight)
-                facingRight = false;
-            else facingRight = true;
+            facingRight = !facingRight;
         }
     }
 
