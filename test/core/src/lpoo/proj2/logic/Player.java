@@ -151,9 +151,7 @@ public class Player extends Sprite {
         if (body.getLinearVelocity().isZero(0.5f)) {
             if ((currentState == State.STOP && stop_run.isAnimationFinished(elapsedTime)) || currentState == State.TURNING && turn.isAnimationFinished(elapsedTime)) {
                 body.setLinearVelocity(0, 0);
-                previousState = currentState;
-                currentState = State.IDLE;
-                elapsedTime = 0;
+                changeState(State.IDLE);
             }
         }
 
@@ -184,27 +182,18 @@ public class Player extends Sprite {
     public void run() {
         if (currentState == State.START_RUN) {
             if (start_run.isAnimationFinished(elapsedTime)) {
-                previousState = currentState;
-                currentState = State.RUNNING;
-                elapsedTime = 0;
+                changeState(State.RUNNING);
             }
         } else if (currentState == State.RUN_JUMP) {
             if (running_jump.isAnimationFinished(elapsedTime)) {
-                previousState = currentState;
-                currentState = State.RUNNING;
-                elapsedTime = 0;
+                changeState(State.RUNNING);
             }
         } else if (currentState == State.LONG_JUMP) {
             if (long_jump.isAnimationFinished(elapsedTime)) {
-                previousState = currentState;
-                currentState = State.RUNNING;
-                elapsedTime = 0;
+                changeState(State.RUNNING);
             }
-
         } else if (currentState != State.RUNNING) {
-            previousState = currentState;
-            currentState = State.START_RUN;
-            elapsedTime = 0;
+            changeState(State.RUNNING);
         }
     }
 
@@ -213,29 +202,23 @@ public class Player extends Sprite {
 
         if (currentState == State.START_RUN) {
             if (start_run.isAnimationFinished(elapsedTime)) {
-                previousState = currentState;
-                currentState = State.STOP;
-                elapsedTime = 0;
+                changeState(State.STOP);
+                body.setLinearVelocity(0f, 0f);
             }
         } else if (currentState == State.RUNNING) {
-            previousState = currentState;
-            currentState = State.STOP;
-            elapsedTime = 0;
+            changeState(State.STOP);
+            body.setLinearVelocity(0f, 0f);
         } else if (currentState == State.WALKING) {
             if (walking.isAnimationFinished(elapsedTime)) {
-                previousState = currentState;
+                changeState(State.IDLE);
                 body.setLinearVelocity(0f, 0f);
-                currentState = State.IDLE;
-                elapsedTime = 0;
             }
         } else if (currentState == State.LONG_JUMP) {
             if (elapsedTime > 1f)
                 body.setLinearVelocity(0, 0);
             if (long_jump.isAnimationFinished(elapsedTime)) {
-                previousState = currentState;
+                changeState(State.IDLE);
                 body.setLinearVelocity(0f, 0f);
-                currentState = State.IDLE;
-                elapsedTime = 0;
             }
         }
 
@@ -263,10 +246,10 @@ public class Player extends Sprite {
             frame = turn.getKeyFrame(elapsedTime);
         }
 
-        if(!facingRight){
+        if (!facingRight) {
             elapsedTime += dt;
             TextureRegion flipped = new TextureRegion(frame);
-            flipped.flip(true,false);
+            flipped.flip(true, false);
             return flipped;
         }
 
@@ -277,55 +260,41 @@ public class Player extends Sprite {
 
     public void jump() {//TODO different jumps for running and standing
         if (currentState == State.RUNNING) {
-            previousState = currentState;
-            currentState = State.RUN_JUMP;
-            elapsedTime = 0;
+            changeState(State.RUN_JUMP);
         } else if (currentState == State.WALKING) {
             if (walking.isAnimationFinished(elapsedTime)) {
-                previousState = currentState;
-                currentState = State.LONG_JUMP;
-                elapsedTime = 0;
+                changeState(State.LONG_JUMP);
                 body.applyForceToCenter(100000f, 0f, true);
             }
         } else if (currentState == State.IDLE) {
-            previousState = currentState;
-            currentState = State.LONG_JUMP;
-            elapsedTime = 0;
+            changeState(State.LONG_JUMP);
         }
     }
 
     public void walk() {
 
-        if (currentState == State.TURNING){
-            if(turn.isAnimationFinished(elapsedTime)){
-                previousState = currentState;
-                currentState = State.WALKING;
-                elapsedTime = 0;
+        if (currentState == State.TURNING) {
+            if (turn.isAnimationFinished(elapsedTime)) {
+                changeState(State.WALKING);
             }
         }
 
         if (currentState != State.WALKING) {
-            previousState = currentState;
-            currentState = State.WALKING;
-            elapsedTime = 0;
+            changeState(State.WALKING);
         }
     }
 
     public void turn() {
         if (currentState == State.WALKING) {
             if (walking.isAnimationFinished(elapsedTime)) {
-                previousState = currentState;
-                currentState = State.TURNING;
-                elapsedTime = 0;
-                if(facingRight)
+                changeState(State.TURNING);
+                if (facingRight)
                     facingRight = false;
                 else facingRight = true;
             }
         } else if (currentState == State.IDLE) {
-            previousState = currentState;
-            currentState = State.TURNING;
-            elapsedTime = 0;
-            if(facingRight)
+            changeState(State.TURNING);
+            if (facingRight)
                 facingRight = false;
             else facingRight = true;
         }
@@ -341,6 +310,12 @@ public class Player extends Sprite {
 
     public boolean isFacingRight() {
         return facingRight;
+    }
+
+    public void changeState(State state) {
+        previousState = currentState;
+        currentState = state;
+        elapsedTime = 0;
     }
 
 }
