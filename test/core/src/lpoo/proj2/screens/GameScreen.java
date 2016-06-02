@@ -91,7 +91,7 @@ public class GameScreen implements Screen {
         handleInput();
         hud.update(delta);
         player.update(delta);
-
+        System.out.println(player.isFacingRight());
         world.step(1 / 60f, 6, 2);
     }
 
@@ -99,16 +99,25 @@ public class GameScreen implements Screen {
         if (hud.walkEnabled()) {
             //TODO walking animations
             if(hud.pressedRight()){
-                player.walk();
+                if(player.isFacingRight())
+                    player.walk();
+            }
+
+            if(hud.pressedLeft()){
+                if(player.isFacingRight()){
+                    player.turn();
+                }
+
+                else player.walk();
             }
 
             if(hud.pressedA()){
-                player.jump();
+                player.jump(); //TODO facing left
             }
 
             else player.stop();
         } else {
-            if (hud.pressedRight()) {
+            if (hud.pressedRight() && player.isFacingRight()) {
 
                 if (hud.pressedA()) {
                     System.out.println(player.getCurrentState());

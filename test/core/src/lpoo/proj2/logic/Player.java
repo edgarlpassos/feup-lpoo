@@ -20,12 +20,15 @@ import lpoo.proj2.screens.GameScreen;
 public class Player extends Sprite {
 
     public enum State {
-        IDLE, START_RUN, RUNNING, STOP,TURNING, TURNING_RUN, RUN_JUMP, LONG_JUMP, FALLING,
+        IDLE, START_RUN, RUNNING, STOP, TURNING, TURNING_RUN, RUN_JUMP, LONG_JUMP, FALLING,
         WALKING, DEAD, ATTACKING, DEFENDING, GETTING_SWORD, STORING_SWORD, SWORD_IDLE, DRINKING, CLIMBING, CLIMB_JUMP, DROP, ESCAPING
     }
 
     public World world;
     public Body body;
+
+    private boolean facingRight;
+
     private TextureRegion idle;
     private Animation running;
     private Animation start_run;
@@ -33,6 +36,7 @@ public class Player extends Sprite {
     private Animation running_jump;
     private Animation walking;
     private Animation long_jump;
+    private Animation turn;
     private float elapsedTime;
     private State currentState;
     private State previousState;
@@ -42,6 +46,8 @@ public class Player extends Sprite {
         super(screen.getTextures().findRegion("playersprites"));
         this.world = screen.getWorld();
         definePlayer();
+
+        facingRight = true;
 
         currentState = State.IDLE;
         previousState = State.IDLE;
@@ -85,17 +91,24 @@ public class Player extends Sprite {
 
 
         //walking animation
-        for (int i = 0; i < 8; i++){
-            frames.add(new TextureRegion(getTexture(),i*40,200,40,40));
+        for (int i = 0; i < 8; i++) {
+            frames.add(new TextureRegion(getTexture(), i * 40, 200, 40, 40));
         }
-        walking = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
+        walking = new Animation(0.1f, frames, Animation.PlayMode.LOOP);
         frames.clear();
 
         //long jump
-        for(int i = 0; i < 15; i++){
-            frames.add(new TextureRegion(getTexture(),i*50,250,50,40));
+        for (int i = 0; i < 15; i++) {
+            frames.add(new TextureRegion(getTexture(), i * 50, 250, 50, 40));
         }
-        long_jump = new Animation(0.1f,frames);
+        long_jump = new Animation(0.1f, frames);
+        frames.clear();
+
+        //turning
+        for (int i = 0; i < 6; i++) {
+            frames.add(new TextureRegion(getTexture(), i * 50, 300, 50, 40));
+        }
+        turn = new Animation(0.12f, frames);
         frames.clear();
 
         body.setTransform(-400f, 0f, 0);
@@ -120,6 +133,7 @@ public class Player extends Sprite {
     public void update(float dt) {
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
         setRegion(getFrame(dt));
+
         //System.out.println(elapsedTime); FIXME remove
 
         //STARTING RUN
@@ -131,15 +145,14 @@ public class Player extends Sprite {
             body.applyLinearImpulse(4f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true); //FIXME adjust speed
 
         //STOPPING
-        if (currentState == State.STOP && !body.getLinearVelocity().isZero(0.5f) )
+        if (currentState == State.STOP && !body.getLinearVelocity().isZero(0.5f))
             body.applyLinearImpulse(-5f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
 
         if (body.getLinearVelocity().isZero(0.5f)) {
-            if(currentState == State.STOP && stop_run.isAnimationFinished(elapsedTime)) {
+            if ((currentState == State.STOP && stop_run.isAnimationFinished(elapsedTime)) || currentState == State.TURNING && turn.isAnimationFinished(elapsedTime)) {
                 body.setLinearVelocity(0, 0);
                 previousState = currentState;
                 currentState = State.IDLE;
-                setRegion(idle);
                 elapsedTime = 0;
             }
         }
@@ -149,13 +162,21 @@ public class Player extends Sprite {
             body.applyLinearImpulse(15f, 0, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
 
         //Walking
-        if(currentState == State.WALKING)
-            body.applyLinearImpulse(1f,0f,body.getWorldCenter().x,body.getWorldCenter().y,true);
+        if (currentState == State.WALKING)
+            body.applyLinearImpulse(1f, 0f, body.getWorldCenter().x, body.getWorldCenter().y, true);
 
         //Long jump
-        if(currentState == State.LONG_JUMP){
+        if (currentState == State.LONG_JUMP) {
             if (elapsedTime > 0.5f && elapsedTime < 1f)
-                body.applyForceToCenter(100000f,0f,true);
+                body.applyForceToCenter(100000f, 0f, true);
+        }
+
+        //turning
+        if (currentState == State.TURNING && !body.getLinearVelocity().isZero(0.5f)) {
+            if (!facingRight)
+                body.applyForceToCenter(-5f, 0, true);
+
+            else body.applyForceToCenter(5f, 0, true);
         }
 
     }
@@ -173,8 +194,8 @@ public class Player extends Sprite {
                 currentState = State.RUNNING;
                 elapsedTime = 0;
             }
-        } else if (currentState == State.LONG_JUMP){
-            if (long_jump.isAnimationFinished(elapsedTime)){
+        } else if (currentState == State.LONG_JUMP) {
+            if (long_jump.isAnimationFinished(elapsedTime)) {
                 previousState = currentState;
                 currentState = State.RUNNING;
                 elapsedTime = 0;
@@ -196,29 +217,23 @@ public class Player extends Sprite {
                 currentState = State.STOP;
                 elapsedTime = 0;
             }
-        }
-
-        else if (currentState == State.RUNNING){
+        } else if (currentState == State.RUNNING) {
             previousState = currentState;
             currentState = State.STOP;
             elapsedTime = 0;
-        }
-
-        else if (currentState == State.WALKING){
-            if(walking.isAnimationFinished(elapsedTime)){
+        } else if (currentState == State.WALKING) {
+            if (walking.isAnimationFinished(elapsedTime)) {
                 previousState = currentState;
-                body.setLinearVelocity(0f,0f);
+                body.setLinearVelocity(0f, 0f);
                 currentState = State.IDLE;
                 elapsedTime = 0;
             }
-        }
-
-        else if (currentState == State.LONG_JUMP){
-            if(elapsedTime > 1f)
-                body.setLinearVelocity(0,0);
-            if(long_jump.isAnimationFinished(elapsedTime)){
+        } else if (currentState == State.LONG_JUMP) {
+            if (elapsedTime > 1f)
+                body.setLinearVelocity(0, 0);
+            if (long_jump.isAnimationFinished(elapsedTime)) {
                 previousState = currentState;
-                body.setLinearVelocity(0f,0f);
+                body.setLinearVelocity(0f, 0f);
                 currentState = State.IDLE;
                 elapsedTime = 0;
             }
@@ -228,24 +243,36 @@ public class Player extends Sprite {
 
     public TextureRegion getFrame(float dt) {
 
-        elapsedTime += dt;
+        TextureRegion frame = idle;
 
         if (currentState == State.START_RUN) {
-            return start_run.getKeyFrame(elapsedTime);
+            frame = start_run.getKeyFrame(elapsedTime);
         } else if (currentState == State.RUNNING) {
-            return running.getKeyFrame(elapsedTime);
+            frame = running.getKeyFrame(elapsedTime);
         } else if (currentState == State.IDLE) {
-            return idle;
+            frame = idle;
         } else if (currentState == State.STOP) {
-            return stop_run.getKeyFrame(elapsedTime);
+            frame = stop_run.getKeyFrame(elapsedTime);
         } else if (currentState == State.RUN_JUMP) {
-            return running_jump.getKeyFrame(elapsedTime);
-        } else if (currentState == State.WALKING){
-            return walking.getKeyFrame(elapsedTime);
-        } else if (currentState == State.LONG_JUMP){
-            return long_jump.getKeyFrame(elapsedTime);
+            frame = running_jump.getKeyFrame(elapsedTime);
+        } else if (currentState == State.WALKING) {
+            frame = walking.getKeyFrame(elapsedTime);
+        } else if (currentState == State.LONG_JUMP) {
+            frame = long_jump.getKeyFrame(elapsedTime);
+        } else if (currentState == State.TURNING) {
+            frame = turn.getKeyFrame(elapsedTime);
         }
-        return idle;
+
+        if(!facingRight){
+            elapsedTime += dt;
+            TextureRegion flipped = new TextureRegion(frame);
+            flipped.flip(true,false);
+            return flipped;
+        }
+
+        elapsedTime += dt;
+        return frame;
+
     }
 
     public void jump() {//TODO different jumps for running and standing
@@ -253,29 +280,54 @@ public class Player extends Sprite {
             previousState = currentState;
             currentState = State.RUN_JUMP;
             elapsedTime = 0;
-        }
-
-        else if(currentState == State.WALKING){
-            if(walking.isAnimationFinished(elapsedTime)){
+        } else if (currentState == State.WALKING) {
+            if (walking.isAnimationFinished(elapsedTime)) {
                 previousState = currentState;
                 currentState = State.LONG_JUMP;
                 elapsedTime = 0;
-                body.applyForceToCenter(100000f,0f,true);
+                body.applyForceToCenter(100000f, 0f, true);
             }
-        }
-
-        else if (currentState == State.IDLE){
+        } else if (currentState == State.IDLE) {
             previousState = currentState;
             currentState = State.LONG_JUMP;
             elapsedTime = 0;
         }
     }
 
-    public void walk(){
-        if(currentState != State.WALKING){
+    public void walk() {
+
+        if (currentState == State.TURNING){
+            if(turn.isAnimationFinished(elapsedTime)){
+                previousState = currentState;
+                currentState = State.WALKING;
+                elapsedTime = 0;
+            }
+        }
+
+        if (currentState != State.WALKING) {
             previousState = currentState;
             currentState = State.WALKING;
             elapsedTime = 0;
+        }
+    }
+
+    public void turn() {
+        if (currentState == State.WALKING) {
+            if (walking.isAnimationFinished(elapsedTime)) {
+                previousState = currentState;
+                currentState = State.TURNING;
+                elapsedTime = 0;
+                if(facingRight)
+                    facingRight = false;
+                else facingRight = true;
+            }
+        } else if (currentState == State.IDLE) {
+            previousState = currentState;
+            currentState = State.TURNING;
+            elapsedTime = 0;
+            if(facingRight)
+                facingRight = false;
+            else facingRight = true;
         }
     }
 
@@ -285,6 +337,10 @@ public class Player extends Sprite {
 
     public State getCurrentState() {
         return currentState;
+    }
+
+    public boolean isFacingRight() {
+        return facingRight;
     }
 
 }
