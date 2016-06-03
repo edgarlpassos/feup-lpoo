@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
 import lpoo.proj2.*;
 import lpoo.proj2.screens.GameScreen;
 
@@ -30,24 +31,24 @@ public class Hud {
 
     private GameScreen screen;
 
-    public Button buttonA;
+    private Button buttonA;
     private Button buttonB;
     private Button walkButton;
     private Button leftButton;
     private Button rightButton;
 
-    public Hud(SpriteBatch batch, final GameScreen screen){
+    public Hud(SpriteBatch batch, final GameScreen screen) {
 
         this.screen = screen;
-        viewport = new FitViewport(lpooGame.WIDTH,lpooGame.HEIGHT,new OrthographicCamera());
-        stage = new Stage(viewport,batch);
+        viewport = new FitViewport(lpooGame.WIDTH, lpooGame.HEIGHT, new OrthographicCamera());
+        stage = new Stage(viewport, batch);
         Gdx.input.setInputProcessor(stage);
 
         Table table = new Table();
         table.top();
         table.setFillParent(true);
 
-
+        //gui buttons
         TextureRegionDrawable aBtn = new TextureRegionDrawable(new TextureRegion(new Texture("gui/a.png")));
         TextureRegionDrawable aBtnPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/a_pressed.png")));
 
@@ -64,12 +65,13 @@ public class Hud {
         TextureRegionDrawable walkPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk_pressed.png")));
 
 
-        buttonA = new ImageButton(aBtn,aBtnPressed);
-        buttonB = new ImageButton(bBtn,bBtnPressed);
-        leftButton = new ImageButton(left,leftPressed);
-        rightButton = new ImageButton(right,rightPressed);
-        walkButton = new ImageButton(walk,walkPressed,walkPressed);
+        buttonA = new ImageButton(aBtn, aBtnPressed);
+        buttonB = new ImageButton(bBtn, bBtnPressed);
+        leftButton = new ImageButton(left, leftPressed);
+        rightButton = new ImageButton(right, rightPressed);
+        walkButton = new ImageButton(walk, walkPressed, walkPressed);
 
+        //placing the buttons
         table.bottom();
         table.left();
         table.add(leftButton).height(40).width(40).padLeft(20);//align(Align.left).fill().pad(0f).space(0f);
@@ -81,11 +83,34 @@ public class Hud {
         table.add(buttonB).height(40).width(40).padRight(20);//.align(Align.right).fill();
 
         stage.addActor(table);
-        table.setDebug(true);
-
+        table.setDebug(true);   //TODO remove later
     }
 
-    public void update(float delta){
+    public void update(float delta) {
         stage.act();
+    }
+
+    public boolean pressedA() {
+        return buttonA.isPressed();
+    }
+
+    public boolean pressedB() {
+        return buttonB.isPressed();
+    }
+
+    public boolean pressedLeft() {
+        return leftButton.isPressed();
+    }
+
+    public boolean pressedRight() {
+        return rightButton.isPressed();
+    }
+
+    public boolean walkEnabled() {
+        return walkButton.isChecked();
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 }
