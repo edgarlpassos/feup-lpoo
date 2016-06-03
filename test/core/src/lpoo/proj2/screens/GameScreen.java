@@ -58,7 +58,7 @@ public class GameScreen implements Screen {
         player.draw(game.batch);
         game.batch.end();
 
-        System.out.println(player.getCurrentState());
+        System.out.println(player.getBoundingRectangle().width);
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.getStage().draw();
