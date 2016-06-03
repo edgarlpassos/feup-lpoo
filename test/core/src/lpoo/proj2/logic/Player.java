@@ -35,6 +35,7 @@ public class Player extends Sprite {
     private Animation walking;
     private Animation long_jump;
     private Animation turn;
+    private Animation run_turn;
 
     private float elapsedTime;
     private State currentState;
@@ -112,12 +113,11 @@ public class Player extends Sprite {
         turn = new Animation(0.1f, frames);
         frames.clear();
 
-        /*//turning right
-        for (int i = 0; i < 6; i++) {
-            frames.add(new TextureRegion(getTexture(), i * 70, 350, 70, 40));
+        for(int i = 0 ; i < 11; i++){
+            frames.add(new TextureRegion(getTexture(),i*33,350,33,40));
         }
-        turnRight = new Animation(0.1f, frames);
-        frames.clear();*/
+        run_turn = new Animation(0.1f,frames);
+        frames.clear();
 
         body.setTransform(-400f, 0f, 0);
         elapsedTime = 0;
@@ -163,17 +163,29 @@ public class Player extends Sprite {
                 break;
 
             case WALKING:
-                body.applyLinearImpulse(direction * 1f, 0f, body.getWorldCenter().x, body.getWorldCenter().y, true);
+                if(elapsedTime <= 0.2f || elapsedTime >= 0.5){
+                    body.setLinearVelocity(0,0);
+                }
+                else body.applyForceToCenter(direction * 200f, 0f,true);
+
                 break;
 
             case LONG_JUMP:
-                if (elapsedTime > 0.5f && elapsedTime < 1f)
-                    body.applyForceToCenter(direction * 100000f, 0f, true);
+                if (elapsedTime <= 0.5f || elapsedTime >= 1f)
+                    body.setLinearVelocity(0,0);
+
+                else body.applyForceToCenter(direction * 100000f, 0f, true);
                 break;
 
             case IDLE:
                 body.setLinearVelocity(0,0);
                 setBounds(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, idle.getRegionWidth(), idle.getRegionHeight());
+                break;
+
+            case TURNING_RUN:
+                while(!run_turn.isAnimationFinished(elapsedTime)){
+                    body.applyForceToCenter(direction * -10f,0,true);
+                }
                 break;
         }
 
@@ -239,6 +251,13 @@ public class Player extends Sprite {
                 }
                 break;
 
+            case TURNING_RUN:
+                if(run_turn.isAnimationFinished(elapsedTime)){
+                    setCurrentAnimation(stop_run);
+                    changeState(State.STOP);
+                    body.setLinearVelocity(0, 0);
+                }
+                break;
 
             default:
                 if(currentAnimation == null || currentAnimation.isAnimationFinished(elapsedTime)) {
@@ -247,55 +266,18 @@ public class Player extends Sprite {
                 }
                 break;
         }
-/*
-        if (currentState == State.START_RUN) {
-            if (elapsedTime >= 0.6f) {
-                setCurrentAnimation(stop_run);
-                changeState(State.STOP);
-                body.setLinearVelocity(0f, 0f);
-            }
-        } else if (currentState == State.TURNING) {
-            if (turn.isAnimationFinished(elapsedTime)) {
-                setBounds(body.getPosition().x, body.getPosition().y, 18, 40);
-                changeState(State.IDLE);
-            }
-        } /*else if (currentState == State.STOP) {
-            setBounds(body.getPosition().x, body.getPosition().y, 18, 40);
-            changeState(State.IDLE);
-        } else if (currentState == State.RUNNING) {
-            changeState(State.STOP);
-            body.setLinearVelocity(0f, 0f);
-            setCurrentAnimation(stop_run);
-        } else if (currentState == State.WALKING) {
-            if (walking.isAnimationFinished(elapsedTime)) {
-                changeState(State.IDLE);
-                body.setLinearVelocity(0f, 0f);
-                setBounds(body.getPosition().x, body.getPosition().y, 18, 40);
-            }
-        } else if (currentState == State.LONG_JUMP) {
-            if (elapsedTime > 1f)
-                body.setLinearVelocity(0, 0);
-            if (long_jump.isAnimationFinished(elapsedTime)) {
-                setBounds(body.getPosition().x, body.getPosition().y, 18, 40);
-                changeState(State.IDLE);
-                body.setLinearVelocity(0f, 0f);
-            }
-        } else if (currentState == State.RUN_JUMP) {
-            if (running_jump.isAnimationFinished(elapsedTime)) {
-                setCurrentAnimation(stop_run);
-                changeState(State.STOP);
-                body.setLinearVelocity(0f, 0f);
-            }
-        }
-*/
     }
 
     public TextureRegion getFrame(float dt) {
 
         TextureRegion frame = idle;
 
-        if (currentState != State.IDLE)
+
+        if (currentState != State.IDLE) {
+            if (elapsedTime >= currentAnimation.getAnimationDuration())
+                elapsedTime = 0;
             frame = currentAnimation.getKeyFrame(elapsedTime);
+        }
 
         if (!facingRight) {
             elapsedTime += dt;
@@ -309,7 +291,7 @@ public class Player extends Sprite {
 
     }
 
-    public void jump() {//TODO different jumps for running and standing
+    public void jump() {
         if (currentState == State.RUNNING) {
             changeState(State.RUN_JUMP);
             setCurrentAnimation(running_jump);
@@ -332,7 +314,10 @@ public class Player extends Sprite {
                 changeState(State.WALKING);
                 setCurrentAnimation(walking);
             }
-        } else if (currentState != State.WALKING) {
+        } else if (currentState == State.WALKING) {
+            changeState(State.WALKING);
+            setCurrentAnimation(walking);
+        } else if (currentState == State.IDLE){
             changeState(State.WALKING);
             setCurrentAnimation(walking);
         }
@@ -349,6 +334,16 @@ public class Player extends Sprite {
             changeState(State.TURNING);
             setCurrentAnimation(turn);
             facingRight = !facingRight;
+        } else if (currentState == State.RUNNING){
+            changeState(State.TURNING_RUN);
+            setCurrentAnimation(run_turn);
+            facingRight = !facingRight;
+        } else if (currentState == State.RUN_JUMP){
+            if(running_jump.isAnimationFinished(elapsedTime)){
+                changeState(State.TURNING_RUN);
+                setCurrentAnimation(run_turn);
+                facingRight = !facingRight;
+            }
         }
     }
 

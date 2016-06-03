@@ -128,7 +128,9 @@ public class GameScreen implements Screen {
 
                     else player.run();
                 //facing left, turn  around
-                } else {/*TODO turning run*/}
+                } else {
+                    player.turn();
+                }
             }
 
             else if(hud.pressedLeft()){
@@ -138,8 +140,14 @@ public class GameScreen implements Screen {
                     else player.run();
                 }
                 //facing right, turn around
-                else {/*TODO turning run*/}
+                else {
+                    player.turn();
+                }
 
+            }
+
+            else if(hud.pressedA()){
+                player.jump();
             }
 
             else player.stop();
