@@ -145,21 +145,25 @@ public class Player extends Sprite {
 
         switch (currentState) {
             case START_RUN:
-                body.applyLinearImpulse(direction * 1f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
+                body.applyForceToCenter(direction * 300f, 0f, true);
                 break;
 
             case RUNNING:
-                body.applyLinearImpulse(direction * 1f, 0f, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
+                body.applyForceToCenter(direction * 500f, 0f, true);
                 break;
 
             case STOP:
                 if (stop_run.isAnimationFinished(elapsedTime))
                     body.setLinearVelocity(0, 0);
-                else body.applyForceToCenter(-5f, 0, true);
+                else body.applyForceToCenter(direction * -1f, 0, true);
                 break;
 
             case RUN_JUMP:
-                body.applyLinearImpulse(direction * 15f, 0, body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, true);
+                if(elapsedTime < 0.4f || elapsedTime >= 0.9)
+                    body.applyForceToCenter(direction * 500f, 0, true);
+
+                else body.applyForceToCenter(direction * 10000f, 0, true);
+
                 break;
 
             case WALKING:
