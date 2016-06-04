@@ -1,4 +1,4 @@
-package lpoo.proj2.screens;
+package lpoo.proj2.gui.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;

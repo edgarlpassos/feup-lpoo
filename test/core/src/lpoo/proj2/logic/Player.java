@@ -1,6 +1,5 @@
 package lpoo.proj2.logic;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,7 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 
-import lpoo.proj2.screens.GameScreen;
+import lpoo.proj2.gui.screen.GameScreen;
 
 /**
  * Created by epassos on 5/13/16.
