@@ -247,8 +247,10 @@ public class Player extends Sprite {
                 break;
 
             case LONG_JUMP:
-                if(long_jump.isAnimationFinished(elapsedTime))
+                if(long_jump.isAnimationFinished(elapsedTime)) {
+                    body.setLinearVelocity(0, 0);
                     changeState(State.IDLE);
+                }
 
                 else if( elapsedTime > 1f){
                     body.setLinearVelocity(0, 0);
@@ -303,7 +305,6 @@ public class Player extends Sprite {
             if (walking.isAnimationFinished(elapsedTime)) {
                 changeState(State.LONG_JUMP);
                 setCurrentAnimation(long_jump);
-                body.applyForceToCenter(100000f, 0f, true);
             }
         } else if (currentState == State.IDLE) {
             changeState(State.LONG_JUMP);
