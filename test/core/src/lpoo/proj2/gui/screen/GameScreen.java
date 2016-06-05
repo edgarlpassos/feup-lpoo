@@ -22,18 +22,19 @@ import lpoo.proj2.logic.Player;
 public class GameScreen extends MyScreen {
 
     private World world;
-   // private lpooGame game;
     private OrthographicCamera cam;
     private Viewport vport;
     private TextureAtlas textures;
     private Hud hud;
-
-
     public Player player;
 
 
     public GameScreen(lpooGame game) {
         super(game);
+        lpooGame.music.stop();
+        lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/game_music.mp3"));
+        lpooGame.music.play();
+
         cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         vport = new FitViewport(lpooGame.WIDTH, lpooGame.HEIGHT, cam);
         textures = new TextureAtlas("sp.pack");

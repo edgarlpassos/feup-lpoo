@@ -1,7 +1,13 @@
 package lpoo.proj2;
 
+import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.AudioDevice;
+import com.badlogic.gdx.audio.AudioRecorder;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -17,11 +23,13 @@ public class lpooGame extends Game {
     public GameStateManager gsm;
     public static final int WIDTH = 800;
     public static final int HEIGHT = 480;
+    public static Music music = null;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         gsm = new GameStateManager();
+
         MyScreen menu_screen = new MainMenuScreen(this);
         GameState main_menu = new GameState(menu_screen,gsm);
         gsm.push(main_menu);

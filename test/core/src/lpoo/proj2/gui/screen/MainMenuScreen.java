@@ -36,6 +36,9 @@ public class MainMenuScreen extends  MyScreen{
     public MainMenuScreen(lpooGame game){
         super(game);
 
+        lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/star_wars.mp3"));
+        lpooGame.music.play();
+        lpooGame.music.setLooping(true);
         cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         viewport = new FitViewport(lpooGame.WIDTH,lpooGame.HEIGHT,cam);
         stage = new Stage(viewport);
