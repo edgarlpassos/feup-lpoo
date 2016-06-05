@@ -63,20 +63,24 @@ public class GameScreen extends MyScreen {
         lpooGame.music.play();
 
 
-        cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        vport = new FitViewport(lpooGame.WIDTH, lpooGame.HEIGHT, cam);
+        //cam = new OrthographicCamera();
+       cam = new OrthographicCamera();
+        vport = new FitViewport(lpooGame.WIDTH/lpooGame.PPM,lpooGame.HEIGHT/lpooGame.PPM, cam);
+        cam.setToOrtho(false,vport.getWorldWidth(),vport.getWorldHeight());
         textures = new TextureAtlas("sp.pack");
         hud = new Hud(game.batch, this);
-        world = new World(new Vector2(0, -1000f * lpooGame.PPM), true);
+        world = new World(new Vector2(0, -10), true);
         player = new Player(this);
         loadmap();
+        //cam.position.set((vport.getWorldWidth()/2),(vport.getWorldHeight()/2),0);
+        //cam.position.set(0,0,0);
     }
 
     public void loadmap(){
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("Map/Map.tmx");
 
-        rend = new OrthogonalTiledMapRenderer(map);
+        rend = new OrthogonalTiledMapRenderer(map,1/lpooGame.PPM);
         b2dr = new Box2DDebugRenderer();
 
 
@@ -89,11 +93,11 @@ public class GameScreen extends MyScreen {
         for(MapObject obj : map.getLayers().get(groundid).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = ((RectangleMapObject) obj).getRectangle();
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bdef.position.set((rect.getX()+rect.getWidth()/2) / lpooGame.PPM,(rect.getY()+rect.getHeight()/2)/ lpooGame.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
+            shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
             fdef.shape = shape;
 
             body.createFixture(fdef);
@@ -103,11 +107,11 @@ public class GameScreen extends MyScreen {
         for(MapObject obj : map.getLayers().get(lamaid).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = ((RectangleMapObject) obj).getRectangle();
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bdef.position.set((rect.getX()+rect.getWidth()/2)/ lpooGame.PPM,(rect.getY()+rect.getHeight()/2)/ lpooGame.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
+            shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
             fdef.shape = shape;
 
             body.createFixture(fdef);
@@ -142,9 +146,9 @@ public class GameScreen extends MyScreen {
         }
 
 
-        cam.position.set(vport.getWorldWidth()/2,vport.getWorldHeight()/2,0);
+
         //Starting point
-        cam.position.add(game.WIDTH*6,game.HEIGHT*2,0);
+        cam.position.add(game.WIDTH*6/lpooGame.PPM,1400/lpooGame.PPM,0);
     }
 
     @Override

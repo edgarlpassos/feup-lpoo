@@ -88,7 +88,6 @@ public class Hud {
         table.add(buttonB).size(40,40);
 
         stage.addActor(table);
-        table.setDebug(true);   //TODO remove later
     }
 
     public void update(float delta) {

@@ -23,8 +23,8 @@ public class lpooGame extends Game {
     public SpriteBatch batch;
 
     public static final int WIDTH = 1400;
-    public static final int HEIGHT = 700;
-    public static final int PPM = 70;
+    public static final int HEIGHT = 780;
+    public static final float PPM = 70;
     public GameStateManager gsm;
     public static Music music = null;
 

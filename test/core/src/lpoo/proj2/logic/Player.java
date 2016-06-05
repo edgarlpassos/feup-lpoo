@@ -57,7 +57,7 @@ public class Player extends Sprite {
 
         //idle sprite
         idle = new TextureRegion(getTexture(), 0, 350, 18, 40);
-        setBounds(1400*6+70*4,700*2+70*5, 18*1, 40 * 1);
+        setBounds(6 * lpooGame.WIDTH / lpooGame.PPM,2*lpooGame.HEIGHT / lpooGame.PPM, 18 /lpooGame.PPM, 40 /lpooGame.PPM);
         setRegion(idle);
 
         Array<TextureRegion> frames = new Array<TextureRegion>();
@@ -128,14 +128,14 @@ public class Player extends Sprite {
 
     public void definePlayer() {
         BodyDef bdef = new BodyDef();
-        bdef.position.set(1400*6+70*4,700*2+70*5);
+        bdef.position.set((lpooGame.HEIGHT*6+70*4)/lpooGame.PPM,(lpooGame.WIDTH*2+70*5)/ lpooGame.PPM);
 
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape cshape = new PolygonShape();
-        cshape.setAsBox(40/2,40/2);
+        cshape.setAsBox((40/2)/lpooGame.PPM,(40/2)/lpooGame.PPM);
         fdef.shape = cshape;
 
         body.createFixture(fdef).setUserData("player");
@@ -187,7 +187,7 @@ public class Player extends Sprite {
 
             case IDLE:
                 body.setLinearVelocity(0,0);
-                setBounds(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, (idle.getRegionWidth())* 1, idle.getRegionHeight() * 1);
+                setBounds((body.getPosition().x - getWidth() / 2)/lpooGame.PPM, (body.getPosition().y - getHeight() / 2)/lpooGame.PPM, (idle.getRegionWidth())/lpooGame.PPM, idle.getRegionHeight()/lpooGame.PPM );
                 break;
 
             case TURNING_RUN:
@@ -376,7 +376,7 @@ public class Player extends Sprite {
 
     public void setCurrentAnimation(Animation animation) {
         currentAnimation = animation;
-        setBounds((body.getPosition().x - getWidth() / 2) * 1, (body.getPosition().y - getHeight() / 2)* 1, (animation.getKeyFrame(0).getRegionWidth())*1, (animation.getKeyFrame(0).getRegionHeight()) *1);
+        setBounds((body.getPosition().x - getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y - getHeight() / 2f) /lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth())/lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) /lpooGame.PPM);
     }
 
 }
