@@ -7,11 +7,13 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 
 import lpoo.proj2.gui.screen.GameScreen;
+import lpoo.proj2.lpooGame;
 
 /**
  * Created by epassos on 5/13/16.
@@ -55,7 +57,7 @@ public class Player extends Sprite {
 
         //idle sprite
         idle = new TextureRegion(getTexture(), 0, 350, 18, 40);
-        setBounds(1400*6+70*4,700*2+70*5, 70*2, 70*2);
+        setBounds(1400*6+70*4,700*2+70*5, 18*1, 40 * 1);
         setRegion(idle);
 
         Array<TextureRegion> frames = new Array<TextureRegion>();
@@ -119,7 +121,7 @@ public class Player extends Sprite {
         frames.clear();
 
         setPosition(1400*6+70*4,700*2+70*5);
-        body.setTransform(1400*6f, 700*2f + 400, 0);
+        body.setTransform(1400*6f+200, 700*2f + 700, 0);
         elapsedTime = 0;
 
     }
@@ -132,8 +134,8 @@ public class Player extends Sprite {
         body = world.createBody(bdef);
 
         FixtureDef fdef = new FixtureDef();
-        CircleShape cshape = new CircleShape();
-        cshape.setRadius(5);
+        PolygonShape cshape = new PolygonShape();
+        cshape.setAsBox(40/2,40/2);
         fdef.shape = cshape;
 
         body.createFixture(fdef).setUserData("player");
@@ -141,29 +143,30 @@ public class Player extends Sprite {
 
     public void update(float dt) {
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
+        body.applyForceToCenter(world.getGravity(),true);
         setRegion(getFrame(dt));
         int direction = facingRight ? 1 : -1;
 
         switch (currentState) {
             case START_RUN:
-                body.applyForceToCenter(direction * 300f, 0f, true);
+                body.applyForceToCenter(direction * 300f * lpooGame.PPM, 0f, true);
                 break;
 
             case RUNNING:
-                body.applyForceToCenter(direction * 500f, 0f, true);
+                body.applyForceToCenter(direction * 1500f * lpooGame.PPM, 0f, true);
                 break;
 
             case STOP:
                 if (stop_run.isAnimationFinished(elapsedTime))
                     body.setLinearVelocity(0, 0);
-                else body.applyForceToCenter(direction * -1f, 0, true);
+                else body.applyForceToCenter(direction * -50f * lpooGame.PPM, 0, true);
                 break;
 
             case RUN_JUMP:
                 if(elapsedTime < 0.4f || elapsedTime >= 0.9)
-                    body.applyForceToCenter(direction * 500f, 0, true);
+                    body.applyForceToCenter(direction * 1500f * lpooGame.PPM, 0, true);
 
-                else body.applyForceToCenter(direction * 10000f, 0, true);
+                else body.applyForceToCenter(direction * 1500f * lpooGame.PPM, 0, true);
 
                 break;
 
@@ -171,7 +174,7 @@ public class Player extends Sprite {
                 if(elapsedTime <= 0.2f || elapsedTime >= 0.5){
                     body.setLinearVelocity(0,0);
                 }
-                else body.applyForceToCenter(direction * 200f, 0f,true);
+                else body.applyForceToCenter(direction * 200f * lpooGame.PPM, 0f,true);
 
                 break;
 
@@ -179,17 +182,17 @@ public class Player extends Sprite {
                 if (elapsedTime <= 0.5f || elapsedTime >= 1f)
                     body.setLinearVelocity(0,0);
 
-                else body.applyForceToCenter(direction * 100000f, 0f, true);
+                else body.applyForceToCenter(direction * 10000f * lpooGame.PPM, 0f, true);
                 break;
 
             case IDLE:
                 body.setLinearVelocity(0,0);
-                setBounds(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, idle.getRegionWidth(), idle.getRegionHeight());
+                setBounds(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, (idle.getRegionWidth())* 1, idle.getRegionHeight() * 1);
                 break;
 
             case TURNING_RUN:
                 while(!run_turn.isAnimationFinished(elapsedTime)){
-                    body.applyForceToCenter(direction * -10f,0,true);
+                    body.applyForceToCenter(direction * -10f * lpooGame.PPM,0,true);
                 }
                 break;
         }
@@ -373,7 +376,7 @@ public class Player extends Sprite {
 
     public void setCurrentAnimation(Animation animation) {
         currentAnimation = animation;
-        setBounds(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2, animation.getKeyFrame(0).getRegionWidth(), animation.getKeyFrame(0).getRegionHeight());
+        setBounds((body.getPosition().x - getWidth() / 2) * 1, (body.getPosition().y - getHeight() / 2)* 1, (animation.getKeyFrame(0).getRegionWidth())*1, (animation.getKeyFrame(0).getRegionHeight()) *1);
     }
 
 }

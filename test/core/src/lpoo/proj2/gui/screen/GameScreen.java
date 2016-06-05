@@ -67,7 +67,7 @@ public class GameScreen extends MyScreen {
         vport = new FitViewport(lpooGame.WIDTH, lpooGame.HEIGHT, cam);
         textures = new TextureAtlas("sp.pack");
         hud = new Hud(game.batch, this);
-        world = new World(new Vector2(0, -9.8f), true);
+        world = new World(new Vector2(0, -1000f * lpooGame.PPM), true);
         player = new Player(this);
         loadmap();
     }
@@ -199,13 +199,7 @@ public class GameScreen extends MyScreen {
 
         cam.update();
         rend.setView(cam);
-        System.out.print(player.getX());
-        System.out.println(player.body.getPosition().x);
-
-        System.out.print(player.getY());
-        System.out.println(player.body.getPosition().y);
         player.update(delta);
-        //System.out.println(player.isFacingRight());
         world.step(1 / 60f, 6, 2);
     }
 
