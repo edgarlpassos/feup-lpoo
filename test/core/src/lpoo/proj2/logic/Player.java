@@ -48,14 +48,14 @@ public class Player extends Sprite {
         this.world = screen.getWorld();
         definePlayer();
 
+        //Inicial status
         facingRight = true;
-
         currentState = State.IDLE;
         previousState = State.IDLE;
 
         //idle sprite
         idle = new TextureRegion(getTexture(), 0, 350, 18, 40);
-        setBounds(0, 0, 18, 40);
+        setBounds(1400*6+70*4,700*2+70*5, 70*2, 70*2);
         setRegion(idle);
 
         Array<TextureRegion> frames = new Array<TextureRegion>();
@@ -118,14 +118,16 @@ public class Player extends Sprite {
         run_turn = new Animation(0.1f,frames);
         frames.clear();
 
-        body.setTransform(-400f, 0f, 0);
+        setPosition(1400*6+70*4,700*2+70*5);
+        body.setTransform(0f, 0f, 0);
         elapsedTime = 0;
 
     }
 
     public void definePlayer() {
         BodyDef bdef = new BodyDef();
-        bdef.position.set(0, 0);
+        bdef.position.set(1400*6+70*4,700*2+70*5);
+
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
 
@@ -134,11 +136,11 @@ public class Player extends Sprite {
         cshape.setRadius(5);
         fdef.shape = cshape;
 
-        body.createFixture(fdef);
+        body.createFixture(fdef).setUserData("player");
     }
 
     public void update(float dt) {
-        setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
+        //setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
         setRegion(getFrame(dt));
         int direction = facingRight ? 1 : -1;
 
