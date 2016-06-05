@@ -57,7 +57,6 @@ public class Player extends Sprite {
 
         //idle sprite
         idle = new TextureRegion(getTexture(), 0, 350, 18, 40);
-        setBounds(6 * lpooGame.WIDTH / lpooGame.PPM,2*lpooGame.HEIGHT / lpooGame.PPM, 18 /lpooGame.PPM, 40 /lpooGame.PPM);
         setRegion(idle);
 
         Array<TextureRegion> frames = new Array<TextureRegion>();
@@ -120,86 +119,86 @@ public class Player extends Sprite {
         run_turn = new Animation(0.1f,frames);
         frames.clear();
 
-        setPosition(1400*6+70*4,700*2+70*5);
-        body.setTransform(1400*6f+200, 700*2f + 700, 0);
+        setPosition(1400*6f+200, 700*2f + 700);
         elapsedTime = 0;
 
     }
 
     public void definePlayer() {
         BodyDef bdef = new BodyDef();
-        bdef.position.set((lpooGame.HEIGHT*6+70*4)/lpooGame.PPM,(lpooGame.WIDTH*2+70*5)/ lpooGame.PPM);
+        bdef.position.set((lpooGame.WIDTH*6f+20)/lpooGame.PPM, (700*2f + 450) / lpooGame.PPM);
 
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape cshape = new PolygonShape();
-        cshape.setAsBox((40/2)/lpooGame.PPM,(40/2)/lpooGame.PPM);
-        fdef.shape = cshape;
+        cshape.setAsBox(18/2 * 2.5f/ lpooGame.PPM, 40 /2 * 2.5f /lpooGame.PPM);//(40/2) / lpooGame.PPM,(40/2)/lpooGame.PPM);
 
+        fdef.shape = cshape;
+        fdef.friction = facingRight ? 1 * -50f /lpooGame.PPM  : -1 * -50f /lpooGame.PPM;
         body.createFixture(fdef).setUserData("player");
     }
 
     public void update(float dt) {
-        setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
-        body.applyForceToCenter(world.getGravity(),true);
+        setPosition((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2));
         setRegion(getFrame(dt));
         int direction = facingRight ? 1 : -1;
 
         switch (currentState) {
             case START_RUN:
-                body.applyForceToCenter(direction * 300f * lpooGame.PPM, 0f, true);
+                body.applyForceToCenter(direction * 400f / lpooGame.PPM, 0f, true);
                 break;
 
             case RUNNING:
-                body.applyForceToCenter(direction * 1500f * lpooGame.PPM, 0f, true);
+                body.applyForceToCenter(direction * 500f /lpooGame.PPM, 0f, true);
                 break;
 
             case STOP:
-                if (stop_run.isAnimationFinished(elapsedTime))
-                    body.setLinearVelocity(0, 0);
-                else body.applyForceToCenter(direction * -50f * lpooGame.PPM, 0, true);
+                if (stop_run.isAnimationFinished(elapsedTime)){}
+                    //body.setLinearVelocity(0, 0);
+                else body.applyForceToCenter(direction * -400f / lpooGame.PPM , 0, true);
                 break;
 
             case RUN_JUMP:
-                if(elapsedTime < 0.4f || elapsedTime >= 0.9)
-                    body.applyForceToCenter(direction * 1500f * lpooGame.PPM, 0, true);
+                if( elapsedTime >= 0.9){
+                    body.applyForceToCenter(direction * -700 / lpooGame.PPM,0,true);
+                }
 
-                else body.applyForceToCenter(direction * 1500f * lpooGame.PPM, 0, true);
-
+                else body.applyForceToCenter(direction * 500f / lpooGame.PPM, 0, true);
                 break;
 
             case WALKING:
                 if(elapsedTime <= 0.2f || elapsedTime >= 0.5){
-                    body.setLinearVelocity(0,0);
                 }
-                else body.applyForceToCenter(direction * 200f * lpooGame.PPM, 0f,true);
+                else body.applyForceToCenter(direction * 500f / lpooGame.PPM, 0f,true);
 
                 break;
 
             case LONG_JUMP:
-                if (elapsedTime <= 0.5f || elapsedTime >= 1f)
-                    body.setLinearVelocity(0,0);
-
-                else body.applyForceToCenter(direction * 10000f * lpooGame.PPM, 0f, true);
+                if (elapsedTime <= 0.4f){}
+                else if( elapsedTime >= 0.8f){
+                    body.applyForceToCenter(direction * -500f / lpooGame.PPM,0,true);
+                }
+                else body.applyForceToCenter(direction * 1500f / lpooGame.PPM, 0f, true);
                 break;
 
             case IDLE:
-                body.setLinearVelocity(0,0);
-                setBounds((body.getPosition().x - getWidth() / 2)/lpooGame.PPM, (body.getPosition().y - getHeight() / 2)/lpooGame.PPM, (idle.getRegionWidth())/lpooGame.PPM, idle.getRegionHeight()/lpooGame.PPM );
+                //body.setLinearVelocity(0,0);
+                setBounds((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2), (idle.getRegionWidth())*2.5f/lpooGame.PPM, idle.getRegionHeight()*2.5f/lpooGame.PPM );
+                System.out.println("In idle - " + (body.getPosition().x - getWidth() / 2)/lpooGame.PPM);
                 break;
 
             case TURNING_RUN:
                 while(!run_turn.isAnimationFinished(elapsedTime)){
-                    body.applyForceToCenter(direction * -10f * lpooGame.PPM,0,true);
+                    body.applyForceToCenter(direction * -10f / lpooGame.PPM,0,true);
                 }
                 break;
         }
 
         if (body.getLinearVelocity().isZero(0.5f)) {
             if ((currentState == State.STOP && stop_run.isAnimationFinished(elapsedTime)) || currentState == State.TURNING && turn.isAnimationFinished(elapsedTime)) {
-                body.setLinearVelocity(0, 0);
+                //body.setLinearVelocity(0, 0);
                 changeState(State.IDLE);
             }
         }
@@ -232,32 +231,32 @@ public class Player extends Sprite {
                 if(elapsedTime >= 0.6f){
                     setCurrentAnimation(stop_run);
                     changeState(State.STOP);
-                    body.setLinearVelocity(0,0);
+                    //body.setLinearVelocity(0,0);
                 }
                 break;
 
             case RUNNING:
                 setCurrentAnimation(stop_run);
                 changeState(State.STOP);
-                body.setLinearVelocity(0,0);
+                //body.setLinearVelocity(0,0);
                 break;
 
             case RUN_JUMP:
                 if(running_jump.isAnimationFinished(elapsedTime)) {
                     setCurrentAnimation(stop_run);
                     changeState(State.STOP);
-                    body.setLinearVelocity(0, 0);
+                    //body.setLinearVelocity(0, 0);
                 }
                 break;
 
             case LONG_JUMP:
                 if(long_jump.isAnimationFinished(elapsedTime)) {
-                    body.setLinearVelocity(0, 0);
+                    //body.setLinearVelocity(0, 0);
                     changeState(State.IDLE);
                 }
 
                 else if( elapsedTime > 1f){
-                    body.setLinearVelocity(0, 0);
+                    //body.setLinearVelocity(0, 0);
                 }
                 break;
 
@@ -265,14 +264,14 @@ public class Player extends Sprite {
                 if(run_turn.isAnimationFinished(elapsedTime)){
                     setCurrentAnimation(stop_run);
                     changeState(State.STOP);
-                    body.setLinearVelocity(0, 0);
+                    //body.setLinearVelocity(0, 0);
                 }
                 break;
 
             default:
                 if(currentAnimation == null || currentAnimation.isAnimationFinished(elapsedTime)) {
                     changeState(State.IDLE);
-                    body.setLinearVelocity(0, 0);
+                    //body.setLinearVelocity(0, 0);
                 }
                 break;
         }
@@ -376,7 +375,8 @@ public class Player extends Sprite {
 
     public void setCurrentAnimation(Animation animation) {
         currentAnimation = animation;
-        setBounds((body.getPosition().x - getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y - getHeight() / 2f) /lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth())/lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) /lpooGame.PPM);
+        setBounds((body.getPosition().x - getWidth() / 2f)/lpooGame.PPM, (body.getPosition().y - getHeight() / 2f)/lpooGame.PPM , (animation.getKeyFrame(0).getRegionWidth())*2.5f/lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight())*2.5f/lpooGame.PPM);
+        System.out.println("In anim func" + (body.getPosition().x - getWidth() / 2f)/lpooGame.PPM);
     }
 
 }

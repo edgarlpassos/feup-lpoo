@@ -69,7 +69,7 @@ public class GameScreen extends MyScreen {
         cam.setToOrtho(false,vport.getWorldWidth(),vport.getWorldHeight());
         textures = new TextureAtlas("sp.pack");
         hud = new Hud(game.batch, this);
-        world = new World(new Vector2(0, -10), true);
+        world = new World(new Vector2(0, -10 ), true);
         player = new Player(this);
         loadmap();
         //cam.position.set((vport.getWorldWidth()/2),(vport.getWorldHeight()/2),0);
@@ -165,8 +165,6 @@ public class GameScreen extends MyScreen {
         game.batch.begin();
         player.draw(game.batch);
         game.batch.end();
-
-        System.out.println(player.getBoundingRectangle().width);
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.getStage().draw();
