@@ -143,7 +143,7 @@ public class GameScreen implements Screen {
 
 
         cam.position.set(vport.getWorldWidth()/2,vport.getWorldHeight()/2,0);
-        cam.position.add(0,game.HEIGHT,0);
+        cam.position.add(game.WIDTH*6,game.HEIGHT*2,0);
     }
 
     @Override
