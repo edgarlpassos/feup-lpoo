@@ -62,7 +62,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        System.out.println("HI"); //FIXME REMOVE
+        //System.out.println("HI"); //FIXME REMOVE
         cam = new OrthographicCamera();
         vport = new StretchViewport(game.WIDTH, game.HEIGHT, cam);
         textures = new TextureAtlas("sp.pack");
@@ -143,6 +143,7 @@ public class GameScreen implements Screen {
 
 
         cam.position.set(vport.getWorldWidth()/2,vport.getWorldHeight()/2,0);
+        //Starting point
         cam.position.add(game.WIDTH*6,game.HEIGHT*2,0);
     }
 
@@ -195,9 +196,13 @@ public class GameScreen implements Screen {
 
         cam.update();
         rend.setView(cam);
+        System.out.print(player.getX());
+        System.out.println(player.body.getPosition().x);
 
+        System.out.print(player.getY());
+        System.out.println(player.body.getPosition().y);
         player.update(delta);
-        System.out.println(player.isFacingRight());
+        //System.out.println(player.isFacingRight());
         world.step(1 / 60f, 6, 2);
     }
 
@@ -226,7 +231,7 @@ public class GameScreen implements Screen {
             if (hud.pressedRight() && player.isFacingRight()) {
 
                 if (hud.pressedA()) {
-                    System.out.println(player.getCurrentState());
+                    //System.out.println(player.getCurrentState());
                     player.jump();
                 } else player.run();
             } else if (hud.pressedLeft()) {
