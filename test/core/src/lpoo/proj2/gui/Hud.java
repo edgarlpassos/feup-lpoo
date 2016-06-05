@@ -32,6 +32,7 @@ public class Hud {
     private Button walkButton;
     private Button leftButton;
     private Button rightButton;
+    private Button sound;
 
     public Hud(SpriteBatch batch, final GameScreen screen) {
 
@@ -60,14 +61,23 @@ public class Hud {
         TextureRegionDrawable walk = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk.png")));
         TextureRegionDrawable walkPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk_pressed.png")));
 
+        TextureRegionDrawable soundOn = new TextureRegionDrawable(new TextureRegion(new Texture("gui/volume_on.png")));
+        TextureRegionDrawable soundOff = new TextureRegionDrawable(new TextureRegion(new Texture("gui/volume_off.png")));
+
+
+
 
         buttonA = new ImageButton(aBtn, aBtnPressed);
         buttonB = new ImageButton(bBtn, bBtnPressed);
         leftButton = new ImageButton(left, leftPressed);
         rightButton = new ImageButton(right, rightPressed);
         walkButton = new ImageButton(walk, walkPressed, walkPressed);
+        sound = new ImageButton(soundOn,soundOff,soundOff);
 
         //placing the buttons
+        table.top();
+        table.right();
+        table.add(sound);
         table.bottom();
         table.left();
         table.add(leftButton).height(40).width(40).padLeft(20);//align(Align.left).fill().pad(0f).space(0f);
@@ -104,6 +114,12 @@ public class Hud {
 
     public boolean walkEnabled() {
         return walkButton.isChecked();
+    }
+
+    public boolean soundEnabled(){return !sound.isChecked();}
+
+    public boolean soundPressed(){
+        return sound.isPressed();
     }
 
     public Stage getStage() {

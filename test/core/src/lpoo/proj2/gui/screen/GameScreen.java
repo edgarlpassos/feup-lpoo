@@ -151,6 +151,10 @@ public class GameScreen extends MyScreen {
             else player.stop();
         }
 
+        if(hud.soundPressed()){
+            toggleMusic();
+        }
+
 
     }
 
@@ -160,5 +164,9 @@ public class GameScreen extends MyScreen {
 
     public World getWorld() {
         return world;
+    }
+
+    public void toggleMusic(){
+        lpooGame.music.setVolume(hud.soundEnabled() ? 1  : 0);
     }
 }
