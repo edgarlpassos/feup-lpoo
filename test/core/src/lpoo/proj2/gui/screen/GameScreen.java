@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -18,10 +19,10 @@ import lpoo.proj2.logic.Player;
 /**
  * Created by epassos on 5/13/16.
  */
-public class GameScreen implements Screen {
+public class GameScreen extends MyScreen {
 
     private World world;
-    private lpooGame game;
+   // private lpooGame game;
     private OrthographicCamera cam;
     private Viewport vport;
     private TextureAtlas textures;
@@ -32,14 +33,9 @@ public class GameScreen implements Screen {
 
 
     public GameScreen(lpooGame game) {
-        this.game = game;
-    }
-
-    @Override
-    public void show() {
-        System.out.println("HI"); //FIXME REMOVE
-        cam = new OrthographicCamera();
-        vport = new StretchViewport(game.WIDTH, game.HEIGHT, cam);
+        super(game);
+        cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        vport = new FitViewport(lpooGame.WIDTH, lpooGame.HEIGHT, cam);
         textures = new TextureAtlas("sp.pack");
         hud = new Hud(game.batch, this);
         world = new World(new Vector2(0, 0), true);
@@ -47,12 +43,13 @@ public class GameScreen implements Screen {
     }
 
     @Override
+    public void show() {
+    }
+
+    @Override
     public void render(float delta) {
+
         update(delta);
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-
         game.batch.setProjectionMatrix(vport.getCamera().combined);
         game.batch.begin();
         player.draw(game.batch);
@@ -66,7 +63,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        vport.update(width, height);
+
     }
 
     @Override
