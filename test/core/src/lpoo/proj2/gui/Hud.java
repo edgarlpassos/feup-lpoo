@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -42,7 +43,6 @@ public class Hud {
         Gdx.input.setInputProcessor(stage);
 
         Table table = new Table();
-        table.top();
         table.setFillParent(true);
 
         //gui buttons
@@ -75,18 +75,17 @@ public class Hud {
         sound = new ImageButton(soundOn,soundOff,soundOff);
 
         //placing the buttons
-        table.top();
-        table.right();
-        table.add(sound);
-        table.bottom();
-        table.left();
-        table.add(leftButton).height(40).width(40).padLeft(20);//align(Align.left).fill().pad(0f).space(0f);
-        table.add(rightButton).height(40).width(40);//align(Align.left).fill().pad(0f).space(0f);
+        table.add(sound).expandX().align(Align.right).size(40,40).colspan(6);
+        table.row();
+        table.add().expandY();
+        table.row();
+        table.add(leftButton).size(40,40);
+        table.add(rightButton).size(40,40).align(Align.left);
+        table.add().expandX();
+        table.add(walkButton).size(40,40);//.align(Align.right);
 
-        table.add(walkButton).height(40).width(80).spaceLeft(520);//.align(Align.right);
-
-        table.add(buttonA).height(40).width(40);//.align(Align.right).fill();
-        table.add(buttonB).height(40).width(40).padRight(20);//.align(Align.right).fill();
+        table.add(buttonA).size(40,40);
+        table.add(buttonB).size(40,40);
 
         stage.addActor(table);
         table.setDebug(true);   //TODO remove later
