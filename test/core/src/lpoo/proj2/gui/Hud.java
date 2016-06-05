@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -32,6 +33,7 @@ public class Hud {
     private Button walkButton;
     private Button leftButton;
     private Button rightButton;
+    private Button sound;
 
     public Hud(SpriteBatch batch, final GameScreen screen) {
 
@@ -41,7 +43,6 @@ public class Hud {
         Gdx.input.setInputProcessor(stage);
 
         Table table = new Table();
-        table.top();
         table.setFillParent(true);
 
         //gui buttons
@@ -60,23 +61,31 @@ public class Hud {
         TextureRegionDrawable walk = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk.png")));
         TextureRegionDrawable walkPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk_pressed.png")));
 
+        TextureRegionDrawable soundOn = new TextureRegionDrawable(new TextureRegion(new Texture("gui/volume_on.png")));
+        TextureRegionDrawable soundOff = new TextureRegionDrawable(new TextureRegion(new Texture("gui/volume_off.png")));
+
+
+
 
         buttonA = new ImageButton(aBtn, aBtnPressed);
         buttonB = new ImageButton(bBtn, bBtnPressed);
         leftButton = new ImageButton(left, leftPressed);
         rightButton = new ImageButton(right, rightPressed);
         walkButton = new ImageButton(walk, walkPressed, walkPressed);
+        sound = new ImageButton(soundOn,soundOff,soundOff);
 
         //placing the buttons
-        table.bottom();
-        table.left();
-        table.add(leftButton).height(40).width(40).padLeft(20);//align(Align.left).fill().pad(0f).space(0f);
-        table.add(rightButton).height(40).width(40);//align(Align.left).fill().pad(0f).space(0f);
+        table.add(sound).expandX().align(Align.right).size(40,40).colspan(6);
+        table.row();
+        table.add().expandY();
+        table.row();
+        table.add(leftButton).size(40,40);
+        table.add(rightButton).size(40,40).align(Align.left);
+        table.add().expandX();
+        table.add(walkButton).size(40,40);//.align(Align.right);
 
-        table.add(walkButton).height(40).width(80).spaceLeft(520);//.align(Align.right);
-
-        table.add(buttonA).height(40).width(40);//.align(Align.right).fill();
-        table.add(buttonB).height(40).width(40).padRight(20);//.align(Align.right).fill();
+        table.add(buttonA).size(40,40);
+        table.add(buttonB).size(40,40);
 
         stage.addActor(table);
         table.setDebug(true);   //TODO remove later
@@ -104,6 +113,12 @@ public class Hud {
 
     public boolean walkEnabled() {
         return walkButton.isChecked();
+    }
+
+    public boolean soundEnabled(){return !sound.isChecked();}
+
+    public boolean soundPressed(){
+        return sound.isPressed();
     }
 
     public Stage getStage() {

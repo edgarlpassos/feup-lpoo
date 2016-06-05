@@ -119,7 +119,7 @@ public class Player extends Sprite {
         frames.clear();
 
         setPosition(1400*6+70*4,700*2+70*5);
-        body.setTransform(0f, 0f, 0);
+        body.setTransform(1400*6f, 700*2f + 400, 0);
         elapsedTime = 0;
 
     }
@@ -140,7 +140,7 @@ public class Player extends Sprite {
     }
 
     public void update(float dt) {
-        //setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
+        setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
         setRegion(getFrame(dt));
         int direction = facingRight ? 1 : -1;
 

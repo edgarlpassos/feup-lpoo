@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -31,7 +32,7 @@ import lpoo.proj2.logic.Player;
 /**
  * Created by epassos on 5/13/16.
  */
-public class GameScreen implements Screen {
+public class GameScreen extends MyScreen {
 
     private static int groundid = 22;
     private static int lamaid = 23;
@@ -39,7 +40,6 @@ public class GameScreen implements Screen {
     private static int keyid = 25;
 
     private World world;
-    private lpooGame game;
     private OrthographicCamera cam;
     private Viewport vport;
     private TextureAtlas textures;
@@ -57,17 +57,17 @@ public class GameScreen implements Screen {
 
 
     public GameScreen(lpooGame game) {
-        this.game = game;
-    }
+        super(game);
+        lpooGame.music.stop();
+        lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/game_music.mp3"));
+        lpooGame.music.play();
 
-    @Override
-    public void show() {
-        //System.out.println("HI"); //FIXME REMOVE
-        cam = new OrthographicCamera();
-        vport = new StretchViewport(game.WIDTH, game.HEIGHT, cam);
+
+        cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        vport = new FitViewport(lpooGame.WIDTH, lpooGame.HEIGHT, cam);
         textures = new TextureAtlas("sp.pack");
         hud = new Hud(game.batch, this);
-        world = new World(new Vector2(0, 0), true);
+        world = new World(new Vector2(0, -9.8f), true);
         player = new Player(this);
         loadmap();
     }
@@ -99,7 +99,7 @@ public class GameScreen implements Screen {
             body.createFixture(fdef);
         }
 
-        // Lama
+        // Lava
         for(MapObject obj : map.getLayers().get(lamaid).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = ((RectangleMapObject) obj).getRectangle();
             bdef.type = BodyDef.BodyType.StaticBody;
@@ -148,14 +148,15 @@ public class GameScreen implements Screen {
     }
 
     @Override
-    public void render(float delta) {
-        update(delta);
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    public void show() {
+    }
 
+    @Override
+    public void render(float delta){
         rend.render();
         b2dr.render(world,cam.combined);
 
+        update(delta);
         game.batch.setProjectionMatrix(vport.getCamera().combined);
         game.batch.begin();
         player.draw(game.batch);
@@ -169,7 +170,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        vport.update(width, height);
+
     }
 
     @Override
@@ -263,6 +264,10 @@ public class GameScreen implements Screen {
 
             else player.stop();
         }
+
+        if(hud.soundPressed()){
+            toggleMusic();
+        }
     }
 
     public TextureAtlas getTextures() {
@@ -271,5 +276,9 @@ public class GameScreen implements Screen {
 
     public World getWorld() {
         return world;
+    }
+
+    public void toggleMusic(){
+        lpooGame.music.setVolume(hud.soundEnabled() ? 1  : 0);
     }
 }
