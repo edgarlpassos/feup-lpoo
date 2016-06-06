@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -22,11 +23,12 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import java.lang.Math;
 
 import lpoo.proj2.*;
 import lpoo.proj2.gui.Hud;
 import lpoo.proj2.logic.Player;
-
+import lpoo.proj2.logic.WorldContactListener;
 
 
 /**
@@ -35,7 +37,7 @@ import lpoo.proj2.logic.Player;
 public class GameScreen extends MyScreen {
 
     private static int groundid = 22;
-    private static int lamaid = 23;
+    private static int lavaid = 23;
     private static int doorid = 24;
     private static int keyid = 25;
 
@@ -44,6 +46,8 @@ public class GameScreen extends MyScreen {
     private Viewport vport;
     private TextureAtlas textures;
     private Hud hud;
+
+    public enum Switch {UP, DOWN, LEFT, RIGHT};
 
     //Map variables
     private OrthogonalTiledMapRenderer rend;
@@ -63,12 +67,15 @@ public class GameScreen extends MyScreen {
         lpooGame.music.play();
 
 
-        cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        vport = new FitViewport(lpooGame.WIDTH, lpooGame.HEIGHT, cam);
+
+        cam = new OrthographicCamera();
+        vport = new FitViewport(lpooGame.WIDTH/lpooGame.PPM,lpooGame.HEIGHT/lpooGame.PPM, cam);
+        cam.setToOrtho(false,vport.getWorldWidth(),vport.getWorldHeight());
         textures = new TextureAtlas("sp.pack");
         hud = new Hud(game.batch, this);
-        world = new World(new Vector2(0, -9.8f), true);
+        world = new World(new Vector2(0, -10), true);
         player = new Player(this);
+        world.setContactListener(new WorldContactListener(player));
         loadmap();
     }
 
@@ -76,7 +83,7 @@ public class GameScreen extends MyScreen {
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("Map/Map.tmx");
 
-        rend = new OrthogonalTiledMapRenderer(map);
+        rend = new OrthogonalTiledMapRenderer(map,1/lpooGame.PPM);
         b2dr = new Box2DDebugRenderer();
 
 
@@ -89,28 +96,28 @@ public class GameScreen extends MyScreen {
         for(MapObject obj : map.getLayers().get(groundid).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = ((RectangleMapObject) obj).getRectangle();
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bdef.position.set((rect.getX()+rect.getWidth()/2) / lpooGame.PPM,(rect.getY()+rect.getHeight()/2)/ lpooGame.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
+            shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
             fdef.shape = shape;
 
-            body.createFixture(fdef);
+            body.createFixture(fdef).setUserData("ground");
         }
 
         // Lava
-        for(MapObject obj : map.getLayers().get(lamaid).getObjects().getByType(RectangleMapObject.class)){
+        for(MapObject obj : map.getLayers().get(lavaid).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = ((RectangleMapObject) obj).getRectangle();
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bdef.position.set((rect.getX()+rect.getWidth()/2)/ lpooGame.PPM,(rect.getY()+rect.getHeight()/2)/ lpooGame.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
+            shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
             fdef.shape = shape;
 
-            body.createFixture(fdef);
+            body.createFixture(fdef).setUserData("lava");
         }
 
         //Door
@@ -124,7 +131,7 @@ public class GameScreen extends MyScreen {
             shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
             fdef.shape = shape;
 
-            body.createFixture(fdef);
+            body.createFixture(fdef).setUserData("door");
         }
 
         //Key
@@ -138,13 +145,11 @@ public class GameScreen extends MyScreen {
             shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
             fdef.shape = shape;
 
-            body.createFixture(fdef);
+            body.createFixture(fdef).setUserData("key");
         }
 
-
-        cam.position.set(vport.getWorldWidth()/2,vport.getWorldHeight()/2,0);
         //Starting point
-        cam.position.add(game.WIDTH*6,game.HEIGHT*2,0);
+        cam.position.add(game.WIDTH*6/lpooGame.PPM,1400/lpooGame.PPM,0);
     }
 
     @Override
@@ -154,16 +159,13 @@ public class GameScreen extends MyScreen {
     @Override
     public void render(float delta){
         rend.render();
-        b2dr.render(world,cam.combined);
+        //b2dr.render(world,cam.combined);
 
         update(delta);
         game.batch.setProjectionMatrix(vport.getCamera().combined);
         game.batch.begin();
         player.draw(game.batch);
         game.batch.end();
-
-        System.out.println(player.getBoundingRectangle().width);
-
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.getStage().draw();
     }
@@ -196,16 +198,11 @@ public class GameScreen extends MyScreen {
     public void update(float delta) {
         handleInput();
         hud.update(delta);
-
+        System.out.println("Camera x = " + cam.position.x);
+        System.out.println("Camera y = " + cam.position.y);
         cam.update();
         rend.setView(cam);
-        System.out.print(player.getX());
-        System.out.println(player.body.getPosition().x);
-
-        System.out.print(player.getY());
-        System.out.println(player.body.getPosition().y);
         player.update(delta);
-        //System.out.println(player.isFacingRight());
         world.step(1 / 60f, 6, 2);
     }
 
@@ -213,22 +210,28 @@ public class GameScreen extends MyScreen {
 
         //Walking animations
         if (hud.walkEnabled()) {
-            if (hud.pressedA()) {   //long jump
-                player.jump();
-            }
 
-            else if (hud.pressedRight()) {
-                if (player.isFacingRight())
+            if (hud.pressedRight()) {
+                if (player.isFacingRight()) {
+                    if (hud.pressedA()) {   //long jump
+                        player.jump();
+                    }
                     player.walk();
+                }
                 //facing left, turn around
                 else player.turn();
             }
             else if (hud.pressedLeft()) {
                 if (!player.isFacingRight()) {
+                    if (hud.pressedA()) {   //long jump
+                        player.jump();
+                    }
                     player.walk();
                 //facing right, turn around
                 } else player.turn();
 
+            } else if (hud.pressedA()) {   //long jump
+                player.climb();
             } else player.stop();
 
         //Running animations
@@ -259,7 +262,7 @@ public class GameScreen extends MyScreen {
             }
 
             else if(hud.pressedA()){
-                player.jump();
+                player.climb();
             }
 
             else player.stop();
@@ -277,8 +280,30 @@ public class GameScreen extends MyScreen {
     public World getWorld() {
         return world;
     }
+    public TiledMap getMap() {return map;}
 
     public void toggleMusic(){
         lpooGame.music.setVolume(hud.soundEnabled() ? 1  : 0);
+    }
+
+    public void switchCamera(Switch direction){
+        switch(direction){
+            case DOWN:
+                cam.position.add(0,-lpooGame.HEIGHT / lpooGame.PPM,0);
+                break;
+            case UP:
+                cam.position.add(0,lpooGame.HEIGHT / lpooGame.PPM,0);
+                break;
+            case LEFT:
+                cam.position.add(-lpooGame.WIDTH / lpooGame.PPM,0,0);
+                break;
+            case RIGHT:
+                cam.position.add(lpooGame.WIDTH / lpooGame.PPM,0,0);
+                break;
+        }
+    }
+
+    public OrthographicCamera getCam(){
+        return cam;
     }
 }

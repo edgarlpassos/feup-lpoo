@@ -38,7 +38,7 @@ public class Hud {
     public Hud(SpriteBatch batch, final GameScreen screen) {
 
         this.screen = screen;
-        viewport = new FitViewport(lpooGame.WIDTH, lpooGame.HEIGHT, new OrthographicCamera());
+        viewport = new FitViewport(lpooGame.WIDTH/2, lpooGame.HEIGHT/2, new OrthographicCamera());
         stage = new Stage(viewport, batch);
         Gdx.input.setInputProcessor(stage);
 
@@ -88,7 +88,6 @@ public class Hud {
         table.add(buttonB).size(40,40);
 
         stage.addActor(table);
-        table.setDebug(true);   //TODO remove later
     }
 
     public void update(float delta) {

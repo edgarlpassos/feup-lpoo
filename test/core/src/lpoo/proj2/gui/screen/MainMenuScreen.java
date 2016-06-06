@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -63,8 +64,9 @@ public class MainMenuScreen extends  MyScreen{
         table.setFillParent(true);
         table.setDebug(true);
         table.top();
-        table.add(title).padBottom(150);
+        table.add(title).padTop(50).expandX().align(Align.center);
         table.row();
+        table.add().expandY();
         table.row();
         table.bottom();
         table.add(playButton).padBottom(50);
