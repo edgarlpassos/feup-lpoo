@@ -22,7 +22,7 @@ public class Player extends Sprite {
 
     public enum State {
         IDLE, START_RUN, RUNNING, STOP, TURNING, TURNING_RUN, RUN_JUMP, LONG_JUMP, FALLING,
-        WALKING, DEAD, ATTACKING, DEFENDING, DRAW_SWORD, SHEATHE_SWORD, SWORD_IDLE, DRINKING, CLIMBING, CLIMB_JUMP, DROP, ESCAPING
+        WALKING, DEAD, ATTACKING, DEFENDING, DRAW_SWORD, SHEATHE_SWORD, SWORD_IDLE, DRINKING, HANGING, CLIMB_JUMP,CLIMBING_UP, DROP, ESCAPING
     }
 
     public World world;
@@ -39,12 +39,15 @@ public class Player extends Sprite {
     private Animation turn;
     private Animation run_turn;
     private Animation climb_jump;
+    private Animation hanging;
+    private Animation climb_up;
 
     private float elapsedTime;
     private State currentState;
     private State previousState;
     private Animation currentAnimation;
     private boolean facingRight;
+    private static final float maxVelocity = 4;
 
     private boolean alive;
     private boolean hasKey;
@@ -134,9 +137,22 @@ public class Player extends Sprite {
         climb_jump = new Animation(0.1f,frames);
         frames.clear();
 
+        //hanging animation
+        for(int i = 0; i < 13; i++){
+            frames.add(new TextureRegion(getTexture(),i*26,500,26,45));
+        }
+        hanging = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
+        frames.clear();
+
+        //climb up animation
+        for(int i = 0; i < 12; i++){
+            frames.add(new TextureRegion(getTexture(),i*30,550,30,83));
+        }
+        climb_up = new Animation(0.1f,frames);
+        frames.clear();
+
         setPosition(1400*6f+200, 700*2f + 700);
         elapsedTime = 0;
-
     }
 
     public void definePlayer() {
@@ -156,9 +172,15 @@ public class Player extends Sprite {
     }
 
     public void update(float dt) {
-        setPosition((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2));
-        setRegion(getFrame(dt));
+
         int direction = facingRight ? 1 : -1;
+
+        if(currentAnimation == climb_up){
+            setPosition(facingRight ? (body.getPosition().x) :body.getPosition().x -getWidth(), (body.getPosition().y - getHeight()/4));
+        }
+        else
+            setPosition((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2));
+        setRegion(getFrame(dt));
 
         if(body.getPosition().y < screen.getCam().position.y - screen.getCam().viewportHeight/2){
             screen.switchCamera(GameScreen.Switch.DOWN);
@@ -176,7 +198,8 @@ public class Player extends Sprite {
                 break;
 
             case RUNNING:
-                body.applyForceToCenter(direction * 500f /lpooGame.PPM, 0f, true);
+                if((body.getLinearVelocity().x  <=  maxVelocity && facingRight) ||( body.getLinearVelocity().x  >=  -maxVelocity && !facingRight))
+                    body.applyForceToCenter(direction * 500f /lpooGame.PPM, 0f, true);
                 break;
 
             case STOP:
@@ -186,11 +209,11 @@ public class Player extends Sprite {
                 break;
 
             case RUN_JUMP:
-                if( elapsedTime >= 0.9){
-                    body.applyForceToCenter(direction * -700 / lpooGame.PPM,0,true);
+                if( elapsedTime >= 0.9 ){
+                    body.applyForceToCenter(direction * -1000 / lpooGame.PPM,0,true);
                 }
 
-                else body.applyForceToCenter(direction * 500f / lpooGame.PPM, 0, true);
+                else body.applyForceToCenter(direction * 700f / lpooGame.PPM, 750f/lpooGame.PPM, true);
                 break;
 
             case WALKING:
@@ -228,6 +251,15 @@ public class Player extends Sprite {
             case CLIMB_JUMP:
                 if(elapsedTime >= 0.7 && elapsedTime <= 0.8f)
                     body.applyForceToCenter(0,4200f / lpooGame.PPM,true);
+                break;
+
+            case HANGING:
+                body.applyForceToCenter(0,-1 * world.getGravity().y,true);
+                break;
+
+            case CLIMBING_UP:
+                    body.applyForceToCenter(0,-2 * world.getGravity().y,true);
+                break;
         }
 
         if (body.getLinearVelocity().isZero(0.5f)) {
@@ -236,6 +268,8 @@ public class Player extends Sprite {
                 changeState(State.IDLE);
             }
         }
+
+        System.out.println(currentState);
     }
 
     public void run() {
@@ -284,14 +318,8 @@ public class Player extends Sprite {
                 break;
 
             case LONG_JUMP:
-                if(long_jump.isAnimationFinished(elapsedTime)) {
-                    //body.setLinearVelocity(0, 0);
+                if(long_jump.isAnimationFinished(elapsedTime))
                     changeState(State.IDLE);
-                }
-
-                else if( elapsedTime > 1f){
-                    //body.setLinearVelocity(0, 0);
-                }
                 break;
 
             case TURNING_RUN:
@@ -299,6 +327,17 @@ public class Player extends Sprite {
                     setCurrentAnimation(stop_run);
                     changeState(State.STOP);
                     //body.setLinearVelocity(0, 0);
+                }
+                break;
+
+            case HANGING:
+                body.applyForceToCenter(0,-1 * world.getGravity().y,true);
+                break;
+
+            case CLIMBING_UP:
+                if(climb_up.isAnimationFinished(elapsedTime)){
+                    body.setTransform(getX()+getWidth()/2,getY()+getHeight(),0);
+                    changeState(State.IDLE);
                 }
                 break;
 
@@ -310,8 +349,6 @@ public class Player extends Sprite {
                 break;
         }
 
-        System.out.println("X = " + body.getPosition().x);
-        System.out.println("Y = " + body.getPosition().y);
     }
 
     public TextureRegion getFrame(float dt) {
@@ -393,8 +430,22 @@ public class Player extends Sprite {
     }
 
     public void climb(){
-        changeState(State.CLIMB_JUMP);
-        setCurrentAnimation(climb_jump);
+        if(currentState == State.IDLE || currentState == State.WALKING) {
+            changeState(State.CLIMB_JUMP);
+            setCurrentAnimation(climb_jump);
+        }
+
+        if(currentState == State.HANGING){
+            changeState(State.CLIMBING_UP);
+            setCurrentAnimation(climb_up);
+        }
+    }
+
+    public void hang(){
+        if(currentState != State.HANGING && previousState != State.HANGING) {
+            changeState(State.HANGING);
+            setCurrentAnimation(hanging);
+        }
     }
 
     public State getPreviousState() {
@@ -441,14 +492,21 @@ public class Player extends Sprite {
 
     public void setCurrentAnimation(Animation animation) {
         currentAnimation = animation;
-        setBounds((body.getPosition().x - getWidth() / 2f)/lpooGame.PPM, (body.getPosition().y - getHeight() / 2f)/lpooGame.PPM , (animation.getKeyFrame(0).getRegionWidth())*2.5f/lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight())*2.5f/lpooGame.PPM);
-        body.destroyFixture(body.getFixtureList().first());
-        FixtureDef fdef = new FixtureDef();
-        PolygonShape cshape = new PolygonShape();
-        cshape.setAsBox((animation.getKeyFrame(0).getRegionWidth())/2 * 2.5f/ lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) /2 * 2.5f /lpooGame.PPM);
-        fdef.shape = cshape;
-        fdef.friction =  50f /lpooGame.PPM;
-        body.createFixture(fdef).setUserData("player");
+        if(animation == climb_up) {
+            setBounds((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
+            System.out.println((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM);
+            System.out.println((body.getPosition().y + getHeight() / 2f) / lpooGame.PPM);
+        }
+        else
+            setBounds((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
+    }
+
+    public Animation getCurrentAnimation(){
+        return currentAnimation;
+    }
+
+    public float getElapsedTime(){
+        return elapsedTime;
     }
 
 }

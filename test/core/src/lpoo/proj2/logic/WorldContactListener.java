@@ -21,19 +21,25 @@ public class WorldContactListener implements ContactListener {
         Fixture fixA = contact.getFixtureA();
         Fixture fixB = contact.getFixtureB();
 
-        if(fixA.getUserData() == "player" || fixB.getUserData() == "player"){
-            Fixture player = fixA.getUserData() == "player" ? fixA :fixB;
+        if(fixA.getUserData() == "player" || fixB.getUserData() == "player") {
+            Fixture player = fixA.getUserData() == "player" ? fixA : fixB;
             Fixture obj = player == fixA ? fixB : fixA;
 
-            if(obj.getUserData() == "lava"){
+            if (obj.getUserData() == "lava") {
                 p.isKilled();
             }
-            if(obj.getUserData() == "door"){
+            if (obj.getUserData() == "door") {
                 p.checkExit();
             }
-            if(obj.getUserData() == "key"){
+            if (obj.getUserData() == "key") {
                 p.pickUpKey();
             }
+
+            if (obj.getUserData() == "climbable"){
+                if(p.getCurrentState() == Player.State.CLIMB_JUMP || p.getCurrentState() == Player.State.RUN_JUMP || p.getCurrentState() == Player.State.LONG_JUMP)
+                    p.hang();
+            }
+
         }
     }
 
