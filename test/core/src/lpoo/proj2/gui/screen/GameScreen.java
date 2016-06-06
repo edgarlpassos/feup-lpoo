@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -22,11 +23,12 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import java.lang.Math;
 
 import lpoo.proj2.*;
 import lpoo.proj2.gui.Hud;
 import lpoo.proj2.logic.Player;
-
+import lpoo.proj2.logic.WorldContactListener;
 
 
 /**
@@ -35,7 +37,7 @@ import lpoo.proj2.logic.Player;
 public class GameScreen extends MyScreen {
 
     private static int groundid = 22;
-    private static int lamaid = 23;
+    private static int lavaid = 23;
     private static int doorid = 24;
     private static int keyid = 25;
 
@@ -63,15 +65,20 @@ public class GameScreen extends MyScreen {
         lpooGame.music.play();
 
 
-        //cam = new OrthographicCamera();
-       cam = new OrthographicCamera();
+
+        cam = new OrthographicCamera();
         vport = new FitViewport(lpooGame.WIDTH/lpooGame.PPM,lpooGame.HEIGHT/lpooGame.PPM, cam);
         cam.setToOrtho(false,vport.getWorldWidth(),vport.getWorldHeight());
         textures = new TextureAtlas("sp.pack");
         hud = new Hud(game.batch, this);
         world = new World(new Vector2(0, -10), true);
+
+
         player = new Player(this);
+        world.setContactListener(new WorldContactListener(player));
         loadmap();
+
+
         //cam.position.set((vport.getWorldWidth()/2),(vport.getWorldHeight()/2),0);
         //cam.position.set(0,0,0);
     }
@@ -100,11 +107,11 @@ public class GameScreen extends MyScreen {
             shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
             fdef.shape = shape;
 
-            body.createFixture(fdef);
+            body.createFixture(fdef).setUserData("ground");
         }
 
         // Lava
-        for(MapObject obj : map.getLayers().get(lamaid).getObjects().getByType(RectangleMapObject.class)){
+        for(MapObject obj : map.getLayers().get(lavaid).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = ((RectangleMapObject) obj).getRectangle();
             bdef.type = BodyDef.BodyType.StaticBody;
             bdef.position.set((rect.getX()+rect.getWidth()/2)/ lpooGame.PPM,(rect.getY()+rect.getHeight()/2)/ lpooGame.PPM);
@@ -114,7 +121,7 @@ public class GameScreen extends MyScreen {
             shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
             fdef.shape = shape;
 
-            body.createFixture(fdef);
+            body.createFixture(fdef).setUserData("lava");
         }
 
         //Door
@@ -128,7 +135,7 @@ public class GameScreen extends MyScreen {
             shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
             fdef.shape = shape;
 
-            body.createFixture(fdef);
+            body.createFixture(fdef).setUserData("door");
         }
 
         //Key
@@ -142,7 +149,7 @@ public class GameScreen extends MyScreen {
             shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
             fdef.shape = shape;
 
-            body.createFixture(fdef);
+            body.createFixture(fdef).setUserData("key");
         }
 
 
@@ -158,7 +165,7 @@ public class GameScreen extends MyScreen {
     @Override
     public void render(float delta){
         rend.render();
-        b2dr.render(world,cam.combined);
+        //b2dr.render(world,cam.combined);
 
         update(delta);
         game.batch.setProjectionMatrix(vport.getCamera().combined);
@@ -166,7 +173,7 @@ public class GameScreen extends MyScreen {
         player.draw(game.batch);
         game.batch.end();
 
-        System.out.println(player.getBoundingRectangle().width);
+        //System.out.println(player.getBoundingRectangle().width);
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.getStage().draw();
@@ -275,6 +282,7 @@ public class GameScreen extends MyScreen {
     public World getWorld() {
         return world;
     }
+    public TiledMap getMap() {return map;}
 
     public void toggleMusic(){
         lpooGame.music.setVolume(hud.soundEnabled() ? 1  : 0);

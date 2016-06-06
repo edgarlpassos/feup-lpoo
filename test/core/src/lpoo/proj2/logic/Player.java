@@ -44,10 +44,14 @@ public class Player extends Sprite {
     private Animation currentAnimation;
     private boolean facingRight;
 
-    public Player(GameScreen screen) {
+    private boolean alive;
+    private boolean hasKey;
 
+    public Player(GameScreen screen) {
         super(screen.getTextures().findRegion("playersprites"));
         this.world = screen.getWorld();
+        alive = true;
+        hasKey = false;
         definePlayer();
 
         //Inicial status
@@ -366,6 +370,30 @@ public class Player extends Sprite {
 
     public boolean isFacingRight() {
         return facingRight;
+    }
+    public boolean isAlive(){
+        return alive;
+    }
+
+    public void isKilled(){
+        alive = false;
+        //TODO die animation
+    }
+    public boolean hasKey(){
+        return hasKey;
+    }
+
+    public void pickUpKey(){
+        if(!hasKey) {
+            hasKey = true;
+            //TODO Pick up key animation
+        }
+    }
+
+    public void checkExit(){
+        if(hasKey){
+            //TODO WIN GAME
+        }
     }
 
     public void changeState(State state) {
