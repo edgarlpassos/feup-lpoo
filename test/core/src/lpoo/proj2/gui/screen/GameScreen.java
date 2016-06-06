@@ -221,7 +221,7 @@ public class GameScreen extends MyScreen {
     public void update(float delta) {
         handleInput();
         hud.update(delta);
-        
+
         if(player.hasKey() && key.getBody() != null){
             world.destroyBody(key.getBody());
             key.getCell().setTile(null);
