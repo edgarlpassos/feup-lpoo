@@ -138,7 +138,7 @@ public class Player extends Sprite {
         cshape.setAsBox(18/2 * 2.5f/ lpooGame.PPM, 40 /2 * 2.5f /lpooGame.PPM);//(40/2) / lpooGame.PPM,(40/2)/lpooGame.PPM);
 
         fdef.shape = cshape;
-        fdef.friction = facingRight ? 1 * -50f /lpooGame.PPM  : -1 * -50f /lpooGame.PPM;
+        fdef.friction =  50f /lpooGame.PPM;
         body.createFixture(fdef).setUserData("player");
     }
 
@@ -196,8 +196,14 @@ public class Player extends Sprite {
                 break;
 
             case IDLE:
-                //body.setLinearVelocity(0,0);
                 setBounds((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2), (idle.getRegionWidth())*2.5f/lpooGame.PPM, idle.getRegionHeight()*2.5f/lpooGame.PPM );
+                body.destroyFixture(body.getFixtureList().first());
+                FixtureDef fdef = new FixtureDef();
+                PolygonShape cshape = new PolygonShape();
+                cshape.setAsBox((idle.getRegionWidth())/2 * 2.5f/ lpooGame.PPM, (idle.getRegionHeight()) /2 * 2.5f /lpooGame.PPM);
+                fdef.shape = cshape;
+                fdef.friction =  50f /lpooGame.PPM;
+                body.createFixture(fdef).setUserData("player");;
                 break;
 
             case TURNING_RUN:
@@ -390,6 +396,13 @@ public class Player extends Sprite {
     public void setCurrentAnimation(Animation animation) {
         currentAnimation = animation;
         setBounds((body.getPosition().x - getWidth() / 2f)/lpooGame.PPM, (body.getPosition().y - getHeight() / 2f)/lpooGame.PPM , (animation.getKeyFrame(0).getRegionWidth())*2.5f/lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight())*2.5f/lpooGame.PPM);
+        body.destroyFixture(body.getFixtureList().first());
+        FixtureDef fdef = new FixtureDef();
+        PolygonShape cshape = new PolygonShape();
+        cshape.setAsBox((animation.getKeyFrame(0).getRegionWidth())/2 * 2.5f/ lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) /2 * 2.5f /lpooGame.PPM);
+        fdef.shape = cshape;
+        fdef.friction =  50f /lpooGame.PPM;
+        body.createFixture(fdef).setUserData("player");
     }
 
 }
