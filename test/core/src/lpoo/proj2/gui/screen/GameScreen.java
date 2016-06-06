@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -36,10 +37,11 @@ import lpoo.proj2.logic.WorldContactListener;
  */
 public class GameScreen extends MyScreen {
 
-    private static int groundid = 22;
-    private static int lavaid = 23;
-    private static int doorid = 24;
-    private static int keyid = 25;
+    private static final int groundid = 22;
+    private static final int lavaid = 23;
+    private static final int doorid = 24;
+    private static final int keyid = 25;
+    private static final int climbableid = 26;
 
     private World world;
     private OrthographicCamera cam;
@@ -121,31 +123,45 @@ public class GameScreen extends MyScreen {
         }
 
         //Door
-        for(MapObject obj : map.getLayers().get(doorid).getObjects().getByType(RectangleMapObject.class)){
-            Rectangle rect = ((RectangleMapObject) obj).getRectangle();
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            for(MapObject obj : map.getLayers().get(doorid).getObjects().getByType(RectangleMapObject.class)){
+                Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+                bdef.type = BodyDef.BodyType.StaticBody;
+                bdef.position.set((rect.getX()+rect.getWidth()/2)/lpooGame.PPM,(rect.getY()+rect.getHeight()/2)/ lpooGame.PPM);
 
-            body = world.createBody(bdef);
+                body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
-            fdef.shape = shape;
+                shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
+                fdef.shape = shape;
 
-            body.createFixture(fdef).setUserData("door");
-        }
+                body.createFixture(fdef).setUserData("door");
+            }
 
         //Key
         for(MapObject obj : map.getLayers().get(keyid).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = ((RectangleMapObject) obj).getRectangle();
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bdef.position.set((rect.getX()+rect.getWidth()/2)/ lpooGame.PPM,(rect.getY()+rect.getHeight()/2)/ lpooGame.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
+            shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
             fdef.shape = shape;
 
             body.createFixture(fdef).setUserData("key");
+        }
+
+        //Climbable edges
+        for(MapObject obj : map.getLayers().get(climbableid).getObjects().getByType(RectangleMapObject.class)){
+            Rectangle rect = ((RectangleMapObject) obj).getRectangle();
+            bdef.type = BodyDef.BodyType.StaticBody;
+            bdef.position.set((rect.getX()+rect.getWidth()/2)/ lpooGame.PPM,(rect.getY()+rect.getHeight()/2)/ lpooGame.PPM);
+
+            body = world.createBody(bdef);
+
+            shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
+            fdef.shape = shape;
+
+            body.createFixture(fdef).setUserData("climbable");
         }
 
         //Starting point
@@ -160,7 +176,6 @@ public class GameScreen extends MyScreen {
     public void render(float delta){
         rend.render();
         //b2dr.render(world,cam.combined);
-
         update(delta);
         game.batch.setProjectionMatrix(vport.getCamera().combined);
         game.batch.begin();
@@ -198,8 +213,6 @@ public class GameScreen extends MyScreen {
     public void update(float delta) {
         handleInput();
         hud.update(delta);
-        System.out.println("Camera x = " + cam.position.x);
-        System.out.println("Camera y = " + cam.position.y);
         cam.update();
         rend.setView(cam);
         player.update(delta);
