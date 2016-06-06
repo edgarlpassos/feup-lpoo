@@ -20,7 +20,7 @@ public class Player extends Sprite {
 
     public enum State {
         IDLE, START_RUN, RUNNING, STOP, TURNING, TURNING_RUN, RUN_JUMP, LONG_JUMP, FALLING,
-        WALKING, DEAD, ATTACKING, DEFENDING, DRAW_SWORD, SHEATHE_SWORD, SWORD_IDLE, DRINKING, HANGING, CLIMB_JUMP,CLIMBING_UP, DROP, ESCAPING
+        WALKING, DEAD, ATTACKING, DEFENDING, DRAW_SWORD, SHEATHE_SWORD, SWORD_IDLE, DRINKING, HANGING, CLIMB_JUMP, CLIMBING_UP, DROP, ESCAPING
     }
 
 
@@ -29,7 +29,9 @@ public class Player extends Sprite {
     private GameScreen screen;
 
     //Textures and Animations
-    private TextureRegion idle;
+    private Animation idle;
+    private TextureRegion falling;
+    private TextureRegion fall_death;
     private Animation running;
     private Animation start_run;
     private Animation stop_run;
@@ -49,6 +51,7 @@ public class Player extends Sprite {
     private Animation currentAnimation;
     private boolean facingRight;
     private static final float maxVelocity = 4;
+    private float yVel;
 
     //Logic variables
     private boolean alive;
@@ -66,12 +69,18 @@ public class Player extends Sprite {
         facingRight = true;
         currentState = State.IDLE;
         previousState = State.IDLE;
+        yVel = 0;
 
-        //idle sprite
-        idle = new TextureRegion(getTexture(), 0, 350, 18, 40);
-        setRegion(idle);
 
         Array<TextureRegion> frames = new Array<TextureRegion>();
+
+        //idle sprite
+        frames.add(new TextureRegion(getTexture(), 0, 350, 18, 40));
+        idle = new Animation(0.1f, frames, Animation.PlayMode.LOOP);
+        frames.clear();
+
+        currentAnimation = idle;
+
 
         //start_run animation
         for (int i = 0; i < 14; i++) {
@@ -126,51 +135,54 @@ public class Player extends Sprite {
         frames.clear();
 
         //running turn animations
-        for(int i = 0 ; i < 11; i++){
-            frames.add(new TextureRegion(getTexture(),i*33,350,33,40));
+        for (int i = 0; i < 11; i++) {
+            frames.add(new TextureRegion(getTexture(), i * 33, 350, 33, 40));
         }
-        run_turn = new Animation(0.1f,frames);
+        run_turn = new Animation(0.1f, frames);
         frames.clear();
 
         //jump to climb animation
-        for(int i = 0; i < 12; i++){
-            frames.add(new TextureRegion(getTexture(),i*20,450,20,48));
+        for (int i = 0; i < 12; i++) {
+            frames.add(new TextureRegion(getTexture(), i * 20, 450, 20, 48));
         }
-        climb_jump = new Animation(0.1f,frames);
+        climb_jump = new Animation(0.1f, frames);
         frames.clear();
 
         //hanging animation
-        for(int i = 0; i < 13; i++){
-            frames.add(new TextureRegion(getTexture(),i*26,500,26,45));
+        for (int i = 0; i < 13; i++) {
+            frames.add(new TextureRegion(getTexture(), i * 26, 500, 26, 45));
         }
-        hanging = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
+        hanging = new Animation(0.1f, frames, Animation.PlayMode.LOOP);
         frames.clear();
 
         //climb up animation
-        for(int i = 0; i < 12; i++){
-            frames.add(new TextureRegion(getTexture(),i*30,550,30,83));
+        for (int i = 0; i < 12; i++) {
+            frames.add(new TextureRegion(getTexture(), i * 30, 550, 30, 83));
         }
-        climb_up = new Animation(0.1f,frames);
+        climb_up = new Animation(0.1f, frames);
         frames.clear();
 
-        setPosition(1400*6f+200, 700*2f + 700);
+        falling = new TextureRegion(getTexture(), 0, 650, 17, 36);
+        fall_death = new TextureRegion(getTexture(), 17, 650, 32, 15);
+
+        setPosition(1400 * 6f + 200, 700 * 2f + 700);
         elapsedTime = 0;
     }
 
     public void definePlayer() {
         BodyDef bdef = new BodyDef();
         //bdef.position.set((lpooGame.WIDTH*6f+20)/lpooGame.PPM, (700*2f + 450) / lpooGame.PPM);
-        bdef.position.set(400/lpooGame.PPM,(lpooGame.HEIGHT+450)/lpooGame.PPM);
+        bdef.position.set(400 / lpooGame.PPM, (lpooGame.HEIGHT + 450) / lpooGame.PPM);
 
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape cshape = new PolygonShape();
-        cshape.setAsBox(18/2 * 2.5f/ lpooGame.PPM, 40 /2 * 2.5f /lpooGame.PPM);//(40/2) / lpooGame.PPM,(40/2)/lpooGame.PPM);
+        cshape.setAsBox(18 / 2 * 2.5f / lpooGame.PPM, 40 / 2 * 2.5f / lpooGame.PPM);//(40/2) / lpooGame.PPM,(40/2)/lpooGame.PPM);
 
         fdef.shape = cshape;
-        fdef.friction =  50f /lpooGame.PPM;
+        fdef.friction = 50f / lpooGame.PPM;
         body.createFixture(fdef).setUserData("player");
     }
 
@@ -178,20 +190,27 @@ public class Player extends Sprite {
 
         int direction = facingRight ? 1 : -1;
 
-        if(currentAnimation == climb_up){
-            setPosition(facingRight ? (body.getPosition().x) :body.getPosition().x -getWidth(), (body.getPosition().y - getHeight()/4));
+        yVel = body.getLinearVelocity().y;
+        System.out.println(yVel);
+        if (yVel < -6f) {
+            changeState(State.FALLING);
         }
-        else
+        if (currentAnimation == climb_up) {
+            setPosition(facingRight ? (body.getPosition().x) : body.getPosition().x - getWidth(), (body.getPosition().y - getHeight() / 4));
+        } else
             setPosition((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2));
         setRegion(getFrame(dt));
 
-        if(body.getPosition().y < screen.getCam().position.y - screen.getCam().viewportHeight/2){
+        if (body.getPosition().y < screen.getCam().position.y - screen.getCam().viewportHeight / 2) {
             screen.switchCamera(GameScreen.Switch.DOWN);
-        } if (body.getPosition().y > screen.getCam().position.y +  screen.getCam().viewportHeight/2){
+        }
+        if (body.getPosition().y > screen.getCam().position.y + screen.getCam().viewportHeight / 2) {
             screen.switchCamera(GameScreen.Switch.UP);
-        } if (body.getPosition().x < screen.getCam().position.x -  screen.getCam().viewportWidth/2){
+        }
+        if (body.getPosition().x < screen.getCam().position.x - screen.getCam().viewportWidth / 2) {
             screen.switchCamera(GameScreen.Switch.LEFT);
-        } if (body.getPosition().x > screen.getCam().position.x +  screen.getCam().viewportWidth/2){
+        }
+        if (body.getPosition().x > screen.getCam().position.x + screen.getCam().viewportWidth / 2) {
             screen.switchCamera(GameScreen.Switch.RIGHT);
         }
 
@@ -201,67 +220,58 @@ public class Player extends Sprite {
                 break;
 
             case RUNNING:
-                if((body.getLinearVelocity().x  <=  maxVelocity && facingRight) ||( body.getLinearVelocity().x  >=  -maxVelocity && !facingRight))
-                    body.applyForceToCenter(direction * 500f /lpooGame.PPM, 0f, true);
+                if ((body.getLinearVelocity().x <= maxVelocity && facingRight) || (body.getLinearVelocity().x >= -maxVelocity && !facingRight))
+                    body.applyForceToCenter(direction * 500f / lpooGame.PPM, 0f, true);
                 break;
 
             case STOP:
-                if (stop_run.isAnimationFinished(elapsedTime)){}
-                    //body.setLinearVelocity(0, 0);
-                else body.applyForceToCenter(direction * -400f / lpooGame.PPM , 0, true);
+                if (stop_run.isAnimationFinished(elapsedTime)) {
+                }
+                //body.setLinearVelocity(0, 0);
+                else body.applyForceToCenter(direction * -400f / lpooGame.PPM, 0, true);
                 break;
 
             case RUN_JUMP:
-                if( elapsedTime >= 0.9 ){
-                    body.applyForceToCenter(direction * -1000 / lpooGame.PPM,0,true);
-                }
-
-                else body.applyForceToCenter(direction * 700f / lpooGame.PPM, 750f/lpooGame.PPM, true);
+                if (elapsedTime >= 0.9) {
+                    body.applyForceToCenter(direction * -1000 / lpooGame.PPM, 0, true);
+                } else
+                    body.applyForceToCenter(direction * 700f / lpooGame.PPM, 750f / lpooGame.PPM, true);
                 break;
 
             case WALKING:
-                if(elapsedTime <= 0.2f || elapsedTime >= 0.5){
-                }
-                else body.applyForceToCenter(direction * 500f / lpooGame.PPM, 0f,true);
+                if (elapsedTime <= 0.2f || elapsedTime >= 0.5) {
+                } else body.applyForceToCenter(direction * 500f / lpooGame.PPM, 0f, true);
 
                 break;
 
             case LONG_JUMP:
-                if (elapsedTime <= 0.4f){}
-                else if( elapsedTime >= 0.8f){
-                    body.applyForceToCenter(direction * -500f / lpooGame.PPM,0,true);
-                }
-                else body.applyForceToCenter(direction * 1500f / lpooGame.PPM, 0f, true);
+                if (elapsedTime <= 0.4f) {
+                } else if (elapsedTime >= 0.8f) {
+                    body.applyForceToCenter(direction * -500f / lpooGame.PPM, 0, true);
+                } else body.applyForceToCenter(direction * 1500f / lpooGame.PPM, 0f, true);
                 break;
 
             case IDLE:
-                setBounds((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2), (idle.getRegionWidth())*2.5f/lpooGame.PPM, idle.getRegionHeight()*2.5f/lpooGame.PPM );
-                body.destroyFixture(body.getFixtureList().first());
-                FixtureDef fdef = new FixtureDef();
-                PolygonShape cshape = new PolygonShape();
-                cshape.setAsBox((idle.getRegionWidth())/2 * 2.5f/ lpooGame.PPM, (idle.getRegionHeight()) /2 * 2.5f /lpooGame.PPM);
-                fdef.shape = cshape;
-                fdef.friction =  50f /lpooGame.PPM;
-                body.createFixture(fdef).setUserData("player");;
+
                 break;
 
             case TURNING_RUN:
-                while(!run_turn.isAnimationFinished(elapsedTime)){
-                    body.applyForceToCenter(direction * -10f / lpooGame.PPM,0,true);
+                while (!run_turn.isAnimationFinished(elapsedTime)) {
+                    body.applyForceToCenter(direction * -10f / lpooGame.PPM, 0, true);
                 }
                 break;
 
             case CLIMB_JUMP:
-                if(elapsedTime >= 0.7 && elapsedTime <= 0.8f)
-                    body.applyForceToCenter(0,4200f / lpooGame.PPM,true);
+                if (elapsedTime >= 0.7 && elapsedTime <= 0.8f)
+                    body.applyForceToCenter(0, 4200f / lpooGame.PPM, true);
                 break;
 
             case HANGING:
-                body.applyForceToCenter(0,-1 * world.getGravity().y,true);
+                body.applyForceToCenter(0, -1 * world.getGravity().y, true);
                 break;
 
             case CLIMBING_UP:
-                    body.applyForceToCenter(0,-2 * world.getGravity().y,true);
+                body.applyForceToCenter(0, -2 * world.getGravity().y, true);
                 break;
         }
 
@@ -272,7 +282,6 @@ public class Player extends Sprite {
             }
         }
 
-        System.out.println(currentState);
     }
 
     public void run() {
@@ -297,9 +306,9 @@ public class Player extends Sprite {
 
     public void stop() {
 
-        switch (currentState){
+        switch (currentState) {
             case START_RUN:
-                if(elapsedTime >= 0.6f){
+                if (elapsedTime >= 0.6f) {
                     setCurrentAnimation(stop_run);
                     changeState(State.STOP);
                     //body.setLinearVelocity(0,0);
@@ -313,7 +322,7 @@ public class Player extends Sprite {
                 break;
 
             case RUN_JUMP:
-                if(running_jump.isAnimationFinished(elapsedTime)) {
+                if (running_jump.isAnimationFinished(elapsedTime)) {
                     setCurrentAnimation(stop_run);
                     changeState(State.STOP);
                     //body.setLinearVelocity(0, 0);
@@ -321,12 +330,14 @@ public class Player extends Sprite {
                 break;
 
             case LONG_JUMP:
-                if(long_jump.isAnimationFinished(elapsedTime))
+                if (long_jump.isAnimationFinished(elapsedTime)) {
+                    setCurrentAnimation(idle);
                     changeState(State.IDLE);
+                }
                 break;
 
             case TURNING_RUN:
-                if(run_turn.isAnimationFinished(elapsedTime)){
+                if (run_turn.isAnimationFinished(elapsedTime)) {
                     setCurrentAnimation(stop_run);
                     changeState(State.STOP);
                     //body.setLinearVelocity(0, 0);
@@ -334,20 +345,21 @@ public class Player extends Sprite {
                 break;
 
             case HANGING:
-                body.applyForceToCenter(0,-1 * world.getGravity().y,true);
+                body.applyForceToCenter(0, -1 * world.getGravity().y, true);
                 break;
 
             case CLIMBING_UP:
-                if(climb_up.isAnimationFinished(elapsedTime)){
-                    body.setTransform(getX()+getWidth()/2,getY()+getHeight(),0);
+                if (climb_up.isAnimationFinished(elapsedTime)) {
+                    body.setTransform(getX() + getWidth() / 2, getY() + getHeight(), 0);
                     changeState(State.IDLE);
+                    setCurrentAnimation(idle);
                 }
                 break;
 
             default:
-                if(currentAnimation == null || currentAnimation.isAnimationFinished(elapsedTime)) {
+                if (currentAnimation == null || currentAnimation.isAnimationFinished(elapsedTime)) {
                     changeState(State.IDLE);
-                    //body.setLinearVelocity(0, 0);
+                    setCurrentAnimation(idle);
                 }
                 break;
         }
@@ -355,14 +367,12 @@ public class Player extends Sprite {
 
     public TextureRegion getFrame(float dt) {
 
-        TextureRegion frame = idle;
+        TextureRegion frame = idle.getKeyFrame(0);
 
 
-        if (currentState != State.IDLE) {
-            if (elapsedTime >= currentAnimation.getAnimationDuration())
-                elapsedTime = 0;
-            frame = currentAnimation.getKeyFrame(elapsedTime);
-        }
+        if (elapsedTime >= currentAnimation.getAnimationDuration())
+            elapsedTime = 0;
+        frame = currentAnimation.getKeyFrame(elapsedTime);
 
         if (!facingRight) {
             elapsedTime += dt;
@@ -381,9 +391,9 @@ public class Player extends Sprite {
             changeState(State.RUN_JUMP);
             setCurrentAnimation(running_jump);
         } else if (currentState == State.WALKING) {
-           // if (walking.isAnimationFinished(elapsedTime)) {
-                changeState(State.LONG_JUMP);
-                setCurrentAnimation(long_jump);
+            // if (walking.isAnimationFinished(elapsedTime)) {
+            changeState(State.LONG_JUMP);
+            setCurrentAnimation(long_jump);
             //}
         } else if (currentState == State.IDLE) {
             changeState(State.LONG_JUMP);
@@ -401,7 +411,7 @@ public class Player extends Sprite {
         } else if (currentState == State.WALKING) {
             changeState(State.WALKING);
             setCurrentAnimation(walking);
-        } else if (currentState == State.IDLE){
+        } else if (currentState == State.IDLE) {
             changeState(State.WALKING);
             setCurrentAnimation(walking);
         }
@@ -418,12 +428,12 @@ public class Player extends Sprite {
             changeState(State.TURNING);
             setCurrentAnimation(turn);
             facingRight = !facingRight;
-        } else if (currentState == State.RUNNING){
+        } else if (currentState == State.RUNNING) {
             changeState(State.TURNING_RUN);
             setCurrentAnimation(run_turn);
             facingRight = !facingRight;
-        } else if (currentState == State.RUN_JUMP){
-            if(running_jump.isAnimationFinished(elapsedTime)){
+        } else if (currentState == State.RUN_JUMP) {
+            if (running_jump.isAnimationFinished(elapsedTime)) {
                 changeState(State.TURNING_RUN);
                 setCurrentAnimation(run_turn);
                 facingRight = !facingRight;
@@ -431,20 +441,20 @@ public class Player extends Sprite {
         }
     }
 
-    public void climb(){
-        if(currentState == State.IDLE || currentState == State.WALKING) {
+    public void climb() {
+        if (currentState == State.IDLE || currentState == State.WALKING) {
             changeState(State.CLIMB_JUMP);
             setCurrentAnimation(climb_jump);
         }
 
-        if(currentState == State.HANGING){
+        if (currentState == State.HANGING) {
             changeState(State.CLIMBING_UP);
             setCurrentAnimation(climb_up);
         }
     }
 
-    public void hang(){
-        if(currentState != State.HANGING && previousState != State.HANGING) {
+    public void hang() {
+        if (currentState != State.HANGING && previousState != State.HANGING) {
             changeState(State.HANGING);
             setCurrentAnimation(hanging);
         }
@@ -461,31 +471,34 @@ public class Player extends Sprite {
     public boolean isFacingRight() {
         return facingRight;
     }
-    public boolean isAlive(){
+
+    public boolean isAlive() {
         return alive;
     }
 
-    public void isKilled(){
+    public void isKilled() {
         alive = false;
         //TODO die animation
     }
-    public boolean hasKey(){
+
+    public boolean hasKey() {
         return hasKey;
     }
 
-    public void pickUpKey(){
-        if(!hasKey) {
+    public void pickUpKey() {
+        if (!hasKey) {
             hasKey = true;
             //TODO Pick up key animation
         }
     }
 
-    public void checkExit(){
-        if(hasKey){
+    public void checkExit() {
+        if (hasKey) {
             //TODO WIN GAME
         }
     }
-    public World getWorld(){
+
+    public World getWorld() {
         return world;
     }
 
@@ -497,20 +510,17 @@ public class Player extends Sprite {
 
     public void setCurrentAnimation(Animation animation) {
         currentAnimation = animation;
-        if(animation == climb_up) {
+        if (animation == climb_up) {
             setBounds((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
-            System.out.println((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM);
-            System.out.println((body.getPosition().y + getHeight() / 2f) / lpooGame.PPM);
-        }
-        else
+        } else
             setBounds((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
     }
 
-    public Animation getCurrentAnimation(){
+    public Animation getCurrentAnimation() {
         return currentAnimation;
     }
 
-    public float getElapsedTime(){
+    public float getElapsedTime() {
         return elapsedTime;
     }
 
