@@ -168,7 +168,7 @@ public class GameScreen extends MyScreen {
     @Override
     public void render(float delta){
         rend.render();
-        b2dr.render(world,cam.combined);
+        //b2dr.render(world,cam.combined);
 
 
         update(delta);
@@ -217,6 +217,10 @@ public class GameScreen extends MyScreen {
             world.destroyBody(key.getBody());
             key.getCell().setTile(null);
             key.setBody(null);
+        }
+
+        if(!player.isAlive()){
+            game.gsm.pop();
         }
 
         cam.update();

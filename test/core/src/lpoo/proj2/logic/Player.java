@@ -5,12 +5,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-
 
 import lpoo.proj2.gui.screen.GameScreen;
 import lpoo.proj2.lpooGame;
@@ -61,7 +59,7 @@ public class Player extends Sprite {
         hasKey = false;
         definePlayer();
 
-        //Inicial status
+        //Initial status
         facingRight = true;
         currentState = State.IDLE;
         previousState = State.IDLE;

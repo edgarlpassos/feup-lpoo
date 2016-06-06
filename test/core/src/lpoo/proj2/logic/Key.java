@@ -1,11 +1,11 @@
 package lpoo.proj2.logic;
 
-import com.badlogic.gdx.maps.tiled.TiledMap;
+
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.physics.box2d.Body;
 
 import lpoo.proj2.gui.screen.GameScreen;
-import lpoo.proj2.lpooGame;
+
 
 /**
  * Created by Antonio on 06-Jun-16.

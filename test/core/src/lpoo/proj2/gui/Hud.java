@@ -75,6 +75,7 @@ public class Hud {
         sound = new ImageButton(soundOn,soundOff,soundOff);
 
         //placing the buttons
+        table.setDebug(false);
         table.add(sound).expandX().align(Align.right).size(40,40).colspan(6);
         table.row();
         table.add().expandY();
