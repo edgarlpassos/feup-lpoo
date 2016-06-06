@@ -30,8 +30,8 @@ public class Player extends Sprite {
 
     //Textures and Animations
     private Animation idle;
-    private TextureRegion falling;
-    private TextureRegion fall_death;
+    private Animation falling;
+    private Animation fall_death;
     private Animation running;
     private Animation start_run;
     private Animation stop_run;
@@ -52,6 +52,8 @@ public class Player extends Sprite {
     private boolean facingRight;
     private static final float maxVelocity = 4;
     private float yVel;
+    private float maxyVel;
+    private float prevyVel;
 
     //Logic variables
     private boolean alive;
@@ -70,6 +72,8 @@ public class Player extends Sprite {
         currentState = State.IDLE;
         previousState = State.IDLE;
         yVel = 0;
+        maxyVel = 0;
+        prevyVel = 0;
 
 
         Array<TextureRegion> frames = new Array<TextureRegion>();
@@ -80,7 +84,6 @@ public class Player extends Sprite {
         frames.clear();
 
         currentAnimation = idle;
-
 
         //start_run animation
         for (int i = 0; i < 14; i++) {
@@ -162,8 +165,16 @@ public class Player extends Sprite {
         climb_up = new Animation(0.1f, frames);
         frames.clear();
 
-        falling = new TextureRegion(getTexture(), 0, 650, 17, 36);
-        fall_death = new TextureRegion(getTexture(), 17, 650, 32, 15);
+
+        //falling animation
+        frames.add(new TextureRegion(getTexture(), 0, 650, 17, 36));
+        falling = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
+        frames.clear();
+
+        //death by fall damage animation
+        frames.add(new TextureRegion(getTexture(), 0, 650, 17, 36));
+        fall_death = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
+        frames.clear();
 
         setPosition(1400 * 6f + 200, 700 * 2f + 700);
         elapsedTime = 0;
@@ -190,10 +201,20 @@ public class Player extends Sprite {
 
         int direction = facingRight ? 1 : -1;
 
+        prevyVel = yVel;
         yVel = body.getLinearVelocity().y;
-        System.out.println(yVel);
-        if (yVel < -6f) {
+        maxyVel = yVel > maxyVel ? yVel : maxyVel;
+
+        if (yVel < -3f && currentState != State.FALLING) {
             changeState(State.FALLING);
+            setCurrentAnimation(falling);
+        }
+
+        if(yVel == 0 && prevyVel != 0){
+            if(prevyVel > 10){
+                setCurrentAnimation(fall_death);
+                isKilled();
+            }
         }
         if (currentAnimation == climb_up) {
             setPosition(facingRight ? (body.getPosition().x) : body.getPosition().x - getWidth(), (body.getPosition().y - getHeight() / 4));
