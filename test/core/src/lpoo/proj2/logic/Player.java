@@ -38,6 +38,7 @@ public class Player extends Sprite {
     private Animation long_jump;
     private Animation turn;
     private Animation run_turn;
+    private Animation climb_jump;
 
     private float elapsedTime;
     private State currentState;
@@ -119,10 +120,18 @@ public class Player extends Sprite {
         turn = new Animation(0.1f, frames);
         frames.clear();
 
+        //running turn animations
         for(int i = 0 ; i < 11; i++){
             frames.add(new TextureRegion(getTexture(),i*33,350,33,40));
         }
         run_turn = new Animation(0.1f,frames);
+        frames.clear();
+
+        //jump to climb animation
+        for(int i = 0; i < 12; i++){
+            frames.add(new TextureRegion(getTexture(),i*20,450,20,48));
+        }
+        climb_jump = new Animation(0.1f,frames);
         frames.clear();
 
         setPosition(1400*6f+200, 700*2f + 700);
@@ -215,6 +224,10 @@ public class Player extends Sprite {
                     body.applyForceToCenter(direction * -10f / lpooGame.PPM,0,true);
                 }
                 break;
+
+            case CLIMB_JUMP:
+                if(elapsedTime >= 0.7 && elapsedTime <= 0.8f)
+                    body.applyForceToCenter(0,4200f / lpooGame.PPM,true);
         }
 
         if (body.getLinearVelocity().isZero(0.5f)) {
@@ -329,10 +342,10 @@ public class Player extends Sprite {
             changeState(State.RUN_JUMP);
             setCurrentAnimation(running_jump);
         } else if (currentState == State.WALKING) {
-            if (walking.isAnimationFinished(elapsedTime)) {
+           // if (walking.isAnimationFinished(elapsedTime)) {
                 changeState(State.LONG_JUMP);
                 setCurrentAnimation(long_jump);
-            }
+            //}
         } else if (currentState == State.IDLE) {
             changeState(State.LONG_JUMP);
             setCurrentAnimation(long_jump);
@@ -377,6 +390,11 @@ public class Player extends Sprite {
                 facingRight = !facingRight;
             }
         }
+    }
+
+    public void climb(){
+        changeState(State.CLIMB_JUMP);
+        setCurrentAnimation(climb_jump);
     }
 
     public State getPreviousState() {

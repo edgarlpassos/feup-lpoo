@@ -210,22 +210,28 @@ public class GameScreen extends MyScreen {
 
         //Walking animations
         if (hud.walkEnabled()) {
-            if (hud.pressedA()) {   //long jump
-                player.jump();
-            }
 
-            else if (hud.pressedRight()) {
-                if (player.isFacingRight())
+            if (hud.pressedRight()) {
+                if (player.isFacingRight()) {
+                    if (hud.pressedA()) {   //long jump
+                        player.jump();
+                    }
                     player.walk();
+                }
                 //facing left, turn around
                 else player.turn();
             }
             else if (hud.pressedLeft()) {
                 if (!player.isFacingRight()) {
+                    if (hud.pressedA()) {   //long jump
+                        player.jump();
+                    }
                     player.walk();
                 //facing right, turn around
                 } else player.turn();
 
+            } else if (hud.pressedA()) {   //long jump
+                player.climb();
             } else player.stop();
 
         //Running animations
@@ -256,7 +262,7 @@ public class GameScreen extends MyScreen {
             }
 
             else if(hud.pressedA()){
-                player.jump();
+                player.climb();
             }
 
             else player.stop();
