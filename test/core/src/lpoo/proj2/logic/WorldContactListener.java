@@ -36,7 +36,8 @@ public class WorldContactListener implements ContactListener {
             }
 
             if (obj.getUserData() == "climbable"){
-                p.hang();
+                if(p.getCurrentState() == Player.State.CLIMB_JUMP || p.getCurrentState() == Player.State.RUN_JUMP || p.getCurrentState() == Player.State.LONG_JUMP)
+                    p.hang();
             }
 
         }

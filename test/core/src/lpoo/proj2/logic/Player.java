@@ -152,10 +152,6 @@ public class Player extends Sprite {
 
         setPosition(1400*6f+200, 700*2f + 700);
         elapsedTime = 0;
-
-        currentState = State.CLIMBING_UP;
-        currentAnimation = climb_up;
-
     }
 
     public void definePlayer() {
@@ -175,7 +171,11 @@ public class Player extends Sprite {
     }
 
     public void update(float dt) {
-        setPosition((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2));
+        if(currentAnimation == climb_up){
+            setPosition((body.getPosition().x), (body.getPosition().y - getHeight()/4));
+        }
+        else
+            setPosition((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2));
         setRegion(getFrame(dt));
         int direction = facingRight ? 1 : -1;
 
@@ -254,7 +254,7 @@ public class Player extends Sprite {
                 break;
 
             case CLIMBING_UP:
-                System.out.println("update!!!");
+                    body.applyForceToCenter(0,-2 * world.getGravity().y,true);
                 break;
         }
 
@@ -332,7 +332,7 @@ public class Player extends Sprite {
 
             case CLIMBING_UP:
                 if(climb_up.isAnimationFinished(elapsedTime)){
-                    body.setLinearVelocity(0,0);
+                    body.setTransform(getX()+getWidth()/2,getY()+getHeight(),0);
                     changeState(State.IDLE);
                 }
                 break;
@@ -488,14 +488,13 @@ public class Player extends Sprite {
 
     public void setCurrentAnimation(Animation animation) {
         currentAnimation = animation;
-        setBounds((body.getPosition().x - getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y - getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
-        body.getFixtureList().clear();
-        FixtureDef fdef = new FixtureDef();
-        PolygonShape cshape = new PolygonShape();
-        cshape.setAsBox((animation.getKeyFrame(0).getRegionWidth()) / 2 * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) / 2 * 2.5f / lpooGame.PPM);
-        fdef.shape = cshape;
-        fdef.friction = 50f / lpooGame.PPM;
-        body.createFixture(fdef).setUserData("player");
+        if(animation == climb_up) {
+            setBounds((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
+            System.out.println((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM);
+            System.out.println((body.getPosition().y + getHeight() / 2f) / lpooGame.PPM);
+        }
+        else
+            setBounds((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
     }
 
     public Animation getCurrentAnimation(){
