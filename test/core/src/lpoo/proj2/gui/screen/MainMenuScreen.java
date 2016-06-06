@@ -30,6 +30,7 @@ public class MainMenuScreen extends  MyScreen{
     private Label title;
     private Label subtitle;
     private Button playButton;
+    private Button exitButton;
     private Stage stage;
     private Viewport viewport;
     private OrthographicCamera cam;
@@ -55,22 +56,19 @@ public class MainMenuScreen extends  MyScreen{
 
 
         playButton = new TextButton("PLAY",style);
+        exitButton = new TextButton("exit",style);
         title = new Label("STAR WARS",titleStyle);
         //subtitle = new Label("INSIDE THE DEATH STAR");
 
 
-
         Table table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
-        table.top();
-        table.add(title).padTop(50).expandX().align(Align.center);
-        table.row();
+        table.setDebug(false);
+        table.add(title).expandX().align(Align.center).colspan(6);
         table.add().expandY();
         table.row();
-        table.bottom();
-        table.add(playButton).padBottom(50);
-
+        table.add(playButton).align(Align.center).expandX();
+        table.add(exitButton).align(Align.center).expandX();
         stage.addActor(table);
     }
 
@@ -109,7 +107,6 @@ public class MainMenuScreen extends  MyScreen{
 
     @Override
     public void dispose() {
-
     }
 
     @Override
@@ -121,7 +118,11 @@ public class MainMenuScreen extends  MyScreen{
     @Override
     public void handleInput() {
         if(playButton.isPressed()){
-            game.gsm.set(new GameState(new GameScreen(game),game.gsm));
+            game.gsm.push(new GameState(new GameScreen(game),game.gsm));
+        }
+
+        if(exitButton.isPressed()){
+            Gdx.app.exit();
         }
     }
 }

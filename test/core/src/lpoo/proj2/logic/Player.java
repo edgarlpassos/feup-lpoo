@@ -5,12 +5,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-
 
 import lpoo.proj2.gui.screen.GameScreen;
 import lpoo.proj2.lpooGame;
@@ -25,10 +23,12 @@ public class Player extends Sprite {
         WALKING, DEAD, ATTACKING, DEFENDING, DRAW_SWORD, SHEATHE_SWORD, SWORD_IDLE, DRINKING, HANGING, CLIMB_JUMP,CLIMBING_UP, DROP, ESCAPING
     }
 
+
     public World world;
     public Body body;
     private GameScreen screen;
 
+    //Textures and Animations
     private TextureRegion idle;
     private Animation running;
     private Animation start_run;
@@ -42,6 +42,7 @@ public class Player extends Sprite {
     private Animation hanging;
     private Animation climb_up;
 
+    //States
     private float elapsedTime;
     private State currentState;
     private State previousState;
@@ -49,6 +50,7 @@ public class Player extends Sprite {
     private boolean facingRight;
     private static final float maxVelocity = 4;
 
+    //Logic variables
     private boolean alive;
     private boolean hasKey;
 
@@ -60,7 +62,7 @@ public class Player extends Sprite {
         hasKey = false;
         definePlayer();
 
-        //Inicial status
+        //Initial status
         facingRight = true;
         currentState = State.IDLE;
         previousState = State.IDLE;
@@ -157,7 +159,8 @@ public class Player extends Sprite {
 
     public void definePlayer() {
         BodyDef bdef = new BodyDef();
-        bdef.position.set((lpooGame.WIDTH*6f+20)/lpooGame.PPM, (700*2f + 450) / lpooGame.PPM);
+        //bdef.position.set((lpooGame.WIDTH*6f+20)/lpooGame.PPM, (700*2f + 450) / lpooGame.PPM);
+        bdef.position.set(400/lpooGame.PPM,(lpooGame.HEIGHT+450)/lpooGame.PPM);
 
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
@@ -348,7 +351,6 @@ public class Player extends Sprite {
                 }
                 break;
         }
-
     }
 
     public TextureRegion getFrame(float dt) {
@@ -482,6 +484,9 @@ public class Player extends Sprite {
         if(hasKey){
             //TODO WIN GAME
         }
+    }
+    public World getWorld(){
+        return world;
     }
 
     public void changeState(State state) {
