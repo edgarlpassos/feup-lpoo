@@ -45,6 +45,8 @@ public class GameScreen extends MyScreen {
     private TextureAtlas textures;
     private Hud hud;
 
+    public enum Switch {UP, DOWN, LEFT, RIGHT};
+
     //Map variables
     private OrthogonalTiledMapRenderer rend;
     private TiledMap map;
@@ -72,8 +74,6 @@ public class GameScreen extends MyScreen {
         world = new World(new Vector2(0, -10 ), true);
         player = new Player(this);
         loadmap();
-        //cam.position.set((vport.getWorldWidth()/2),(vport.getWorldHeight()/2),0);
-        //cam.position.set(0,0,0);
     }
 
     public void loadmap(){
@@ -145,8 +145,6 @@ public class GameScreen extends MyScreen {
             body.createFixture(fdef);
         }
 
-
-
         //Starting point
         cam.position.add(game.WIDTH*6/lpooGame.PPM,1400/lpooGame.PPM,0);
     }
@@ -198,7 +196,8 @@ public class GameScreen extends MyScreen {
     public void update(float delta) {
         handleInput();
         hud.update(delta);
-
+        System.out.println("Camera x = " + cam.position.x);
+        System.out.println("Camera y = " + cam.position.y);
         cam.update();
         rend.setView(cam);
         player.update(delta);
@@ -276,5 +275,26 @@ public class GameScreen extends MyScreen {
 
     public void toggleMusic(){
         lpooGame.music.setVolume(hud.soundEnabled() ? 1  : 0);
+    }
+
+    public void switchCamera(Switch direction){
+        switch(direction){
+            case DOWN:
+                cam.position.add(0,-lpooGame.HEIGHT / lpooGame.PPM,0);
+                break;
+            case UP:
+                cam.position.add(0,lpooGame.HEIGHT / lpooGame.PPM,0);
+                break;
+            case LEFT:
+                cam.position.add(-lpooGame.WIDTH / lpooGame.PPM,0,0);
+                break;
+            case RIGHT:
+                cam.position.add(lpooGame.WIDTH / lpooGame.PPM,0,0);
+                break;
+        }
+    }
+
+    public OrthographicCamera getCam(){
+        return cam;
     }
 }

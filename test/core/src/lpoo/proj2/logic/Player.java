@@ -27,6 +27,7 @@ public class Player extends Sprite {
 
     public World world;
     public Body body;
+    private GameScreen screen;
 
     private TextureRegion idle;
     private Animation running;
@@ -48,6 +49,7 @@ public class Player extends Sprite {
 
         super(screen.getTextures().findRegion("playersprites"));
         this.world = screen.getWorld();
+        this.screen = screen;
         definePlayer();
 
         //Inicial status
@@ -145,6 +147,16 @@ public class Player extends Sprite {
         setRegion(getFrame(dt));
         int direction = facingRight ? 1 : -1;
 
+        if(body.getPosition().y < screen.getCam().position.y - screen.getCam().viewportHeight/2){
+            screen.switchCamera(GameScreen.Switch.DOWN);
+        } if (body.getPosition().y > screen.getCam().position.y +  screen.getCam().viewportHeight/2){
+            screen.switchCamera(GameScreen.Switch.UP);
+        } if (body.getPosition().x < screen.getCam().position.x -  screen.getCam().viewportWidth/2){
+            screen.switchCamera(GameScreen.Switch.LEFT);
+        } if (body.getPosition().x > screen.getCam().position.x +  screen.getCam().viewportWidth/2){
+            screen.switchCamera(GameScreen.Switch.RIGHT);
+        }
+
         switch (currentState) {
             case START_RUN:
                 body.applyForceToCenter(direction * 400f / lpooGame.PPM, 0f, true);
@@ -186,7 +198,6 @@ public class Player extends Sprite {
             case IDLE:
                 //body.setLinearVelocity(0,0);
                 setBounds((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2), (idle.getRegionWidth())*2.5f/lpooGame.PPM, idle.getRegionHeight()*2.5f/lpooGame.PPM );
-                System.out.println("In idle - " + (body.getPosition().x - getWidth() / 2)/lpooGame.PPM);
                 break;
 
             case TURNING_RUN:
@@ -275,6 +286,9 @@ public class Player extends Sprite {
                 }
                 break;
         }
+
+        System.out.println("X = " + body.getPosition().x);
+        System.out.println("Y = " + body.getPosition().y);
     }
 
     public TextureRegion getFrame(float dt) {
@@ -376,7 +390,6 @@ public class Player extends Sprite {
     public void setCurrentAnimation(Animation animation) {
         currentAnimation = animation;
         setBounds((body.getPosition().x - getWidth() / 2f)/lpooGame.PPM, (body.getPosition().y - getHeight() / 2f)/lpooGame.PPM , (animation.getKeyFrame(0).getRegionWidth())*2.5f/lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight())*2.5f/lpooGame.PPM);
-        System.out.println("In anim func" + (body.getPosition().x - getWidth() / 2f)/lpooGame.PPM);
     }
 
 }
