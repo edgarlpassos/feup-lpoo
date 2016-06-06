@@ -25,10 +25,12 @@ public class Player extends Sprite {
         WALKING, DEAD, ATTACKING, DEFENDING, DRAW_SWORD, SHEATHE_SWORD, SWORD_IDLE, DRINKING, CLIMBING, CLIMB_JUMP, DROP, ESCAPING
     }
 
+
     public World world;
     public Body body;
     private GameScreen screen;
 
+    //Textures and Animations
     private TextureRegion idle;
     private Animation running;
     private Animation start_run;
@@ -40,12 +42,14 @@ public class Player extends Sprite {
     private Animation run_turn;
     private Animation climb_jump;
 
+    //States
     private float elapsedTime;
     private State currentState;
     private State previousState;
     private Animation currentAnimation;
     private boolean facingRight;
 
+    //Logic variables
     private boolean alive;
     private boolean hasKey;
 
@@ -141,7 +145,8 @@ public class Player extends Sprite {
 
     public void definePlayer() {
         BodyDef bdef = new BodyDef();
-        bdef.position.set((lpooGame.WIDTH*6f+20)/lpooGame.PPM, (700*2f + 450) / lpooGame.PPM);
+        //bdef.position.set((lpooGame.WIDTH*6f+20)/lpooGame.PPM, (700*2f + 450) / lpooGame.PPM);
+        bdef.position.set(400/lpooGame.PPM,(lpooGame.HEIGHT+450)/lpooGame.PPM);
 
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
@@ -310,8 +315,8 @@ public class Player extends Sprite {
                 break;
         }
 
-        System.out.println("X = " + body.getPosition().x);
-        System.out.println("Y = " + body.getPosition().y);
+        //System.out.println("X = " + body.getPosition().x);
+        //System.out.println("Y = " + body.getPosition().y);
     }
 
     public TextureRegion getFrame(float dt) {
@@ -431,6 +436,9 @@ public class Player extends Sprite {
         if(hasKey){
             //TODO WIN GAME
         }
+    }
+    public World getWorld(){
+        return world;
     }
 
     public void changeState(State state) {

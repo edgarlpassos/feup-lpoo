@@ -787,7 +787,7 @@
 </data>
  </layer>
  <objectgroup name="Ground" offsetx="0" offsety="3.0303">
-  <object id="1" x="700" y="206.061" width="836.364" height="66.6667"/>
+  <object id="1" x="700" y="207.97" width="836.364" height="64.758"/>
   <object id="2" x="1472.73" y="272.727" width="66.6667" height="145.455"/>
   <object id="3" x="1539.39" y="418.182" width="278.788" height="66.6667"/>
   <object id="4" x="1748.48" y="490.909" width="69.697" height="63.6364"/>
@@ -827,9 +827,9 @@
   <object id="50" x="3284.85" y="203.03" width="69.697" height="139.394"/>
   <object id="51" x="3357.58" y="133.333" width="981.818" height="75.7576"/>
   <object id="54" x="2660.61" y="627.273" width="1815.15" height="72.7273"/>
-  <object id="56" x="703.03" y="836.364" width="1327.27" height="66.6667"/>
+  <object id="56" x="702.03" y="838.364" width="1327.27" height="69.6057"/>
   <object id="57" x="1821.21" y="903.03" width="209.091" height="284.848"/>
-  <object id="59" x="0" y="1254.97" width="139.394" height="845.035"/>
+  <object id="59" x="0" y="1257.97" width="139.394" height="842.035"/>
   <object id="60" x="136.364" y="1467.97" width="706.061" height="71"/>
   <object id="61" x="421.212" y="1676.97" width="72.7273" height="420.002"/>
   <object id="62" x="496.939" y="1678.7" width="621.212" height="72.7273"/>
@@ -844,7 +844,7 @@
   <object id="73" x="2737.36" y="917.091" width="60.6061" height="134.879"/>
   <object id="74" x="2800" y="1048.48" width="701" height="63.6364"/>
   <object id="75" x="3433.33" y="1115.15" width="67.67" height="560.606"/>
-  <object id="76" x="700" y="1045.45" width="701" height="72.7273"/>
+  <object id="76" x="700" y="1048.97" width="701" height="69.2076"/>
   <object id="77" x="1333.27" y="1121.21" width="66.6667" height="69.697"/>
   <object id="78" x="1393.94" y="1188.97" width="424.242" height="71.6373"/>
   <object id="79" x="980" y="1121.21" width="77.5762" height="272.727"/>
@@ -917,6 +917,6 @@
   <object id="148" x="11760.6" y="945.455" width="66.6667" height="100"/>
  </objectgroup>
  <objectgroup name="Key">
-  <object id="154" x="352" y="1199" width="65" height="56"/>
+  <object id="154" x="353" y="1202" width="63" height="41"/>
  </objectgroup>
 </map>

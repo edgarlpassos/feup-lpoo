@@ -29,6 +29,7 @@ import lpoo.proj2.*;
 import lpoo.proj2.gui.Hud;
 import lpoo.proj2.logic.Player;
 import lpoo.proj2.logic.WorldContactListener;
+import lpoo.proj2.logic.Key;
 
 
 /**
@@ -47,6 +48,8 @@ public class GameScreen extends MyScreen {
     private TextureAtlas textures;
     private Hud hud;
 
+
+
     public enum Switch {UP, DOWN, LEFT, RIGHT};
 
     //Map variables
@@ -58,6 +61,7 @@ public class GameScreen extends MyScreen {
 
     //Player
     public Player player;
+    private Key key;
 
 
     public GameScreen(lpooGame game) {
@@ -75,6 +79,7 @@ public class GameScreen extends MyScreen {
         hud = new Hud(game.batch, this);
         world = new World(new Vector2(0, -10), true);
         player = new Player(this);
+        key = null;
         world.setContactListener(new WorldContactListener(player));
         loadmap();
     }
@@ -124,11 +129,11 @@ public class GameScreen extends MyScreen {
         for(MapObject obj : map.getLayers().get(doorid).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = ((RectangleMapObject) obj).getRectangle();
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bdef.position.set((rect.getX()+rect.getWidth()/2)/ lpooGame.PPM,(rect.getY()+rect.getHeight()/2)/ lpooGame.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
+            shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
             fdef.shape = shape;
 
             body.createFixture(fdef).setUserData("door");
@@ -138,18 +143,22 @@ public class GameScreen extends MyScreen {
         for(MapObject obj : map.getLayers().get(keyid).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = ((RectangleMapObject) obj).getRectangle();
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX()+rect.getWidth()/2,rect.getY()+rect.getHeight()/2);
+            bdef.position.set((rect.getX()+rect.getWidth()/2)/ lpooGame.PPM,(rect.getY()+rect.getHeight()/2)/ lpooGame.PPM);
 
             body = world.createBody(bdef);
 
-            shape.setAsBox(rect.getWidth()/2,rect.getHeight()/2);
+            shape.setAsBox(rect.getWidth()/2/ lpooGame.PPM,rect.getHeight()/2/ lpooGame.PPM);
             fdef.shape = shape;
 
             body.createFixture(fdef).setUserData("key");
+
+
+
+            key = new Key(body,this);
         }
 
         //Starting point
-        cam.position.add(game.WIDTH*6/lpooGame.PPM,1400/lpooGame.PPM,0);
+        //cam.position.add(game.WIDTH*6/lpooGame.PPM,1400/lpooGame.PPM,0);
     }
 
     @Override
@@ -159,7 +168,8 @@ public class GameScreen extends MyScreen {
     @Override
     public void render(float delta){
         rend.render();
-        //b2dr.render(world,cam.combined);
+        b2dr.render(world,cam.combined);
+
 
         update(delta);
         game.batch.setProjectionMatrix(vport.getCamera().combined);
@@ -198,8 +208,17 @@ public class GameScreen extends MyScreen {
     public void update(float delta) {
         handleInput();
         hud.update(delta);
-        System.out.println("Camera x = " + cam.position.x);
-        System.out.println("Camera y = " + cam.position.y);
+        //System.out.println("Camera x = " + cam.position.x);
+        //System.out.println("Camera y = " + cam.position.y);
+        //System.out.println(player.isAlive());
+        System.out.println(player.hasKey());
+
+        if(player.hasKey() && key.getBody() != null){
+            world.destroyBody(key.getBody());
+            key.getCell().setTile(null);
+            key.setBody(null);
+        }
+
         cam.update();
         rend.setView(cam);
         player.update(delta);
