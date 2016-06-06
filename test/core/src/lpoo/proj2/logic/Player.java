@@ -47,6 +47,7 @@ public class Player extends Sprite {
     private State previousState;
     private Animation currentAnimation;
     private boolean facingRight;
+    private static final float maxVelocity = 4;
 
     private boolean alive;
     private boolean hasKey;
@@ -171,13 +172,15 @@ public class Player extends Sprite {
     }
 
     public void update(float dt) {
+
+        int direction = facingRight ? 1 : -1;
+
         if(currentAnimation == climb_up){
-            setPosition((body.getPosition().x), (body.getPosition().y - getHeight()/4));
+            setPosition(facingRight ? (body.getPosition().x) :body.getPosition().x -getWidth(), (body.getPosition().y - getHeight()/4));
         }
         else
             setPosition((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2));
         setRegion(getFrame(dt));
-        int direction = facingRight ? 1 : -1;
 
         if(body.getPosition().y < screen.getCam().position.y - screen.getCam().viewportHeight/2){
             screen.switchCamera(GameScreen.Switch.DOWN);
@@ -195,7 +198,8 @@ public class Player extends Sprite {
                 break;
 
             case RUNNING:
-                body.applyForceToCenter(direction * 500f /lpooGame.PPM, 0f, true);
+                if((body.getLinearVelocity().x  <=  maxVelocity && facingRight) ||( body.getLinearVelocity().x  >=  -maxVelocity && !facingRight))
+                    body.applyForceToCenter(direction * 500f /lpooGame.PPM, 0f, true);
                 break;
 
             case STOP:
@@ -205,11 +209,11 @@ public class Player extends Sprite {
                 break;
 
             case RUN_JUMP:
-                if( elapsedTime >= 0.9){
-                    body.applyForceToCenter(direction * -700 / lpooGame.PPM,0,true);
+                if( elapsedTime >= 0.9 ){
+                    body.applyForceToCenter(direction * -1000 / lpooGame.PPM,0,true);
                 }
 
-                else body.applyForceToCenter(direction * 500f / lpooGame.PPM, 0, true);
+                else body.applyForceToCenter(direction * 700f / lpooGame.PPM, 750f/lpooGame.PPM, true);
                 break;
 
             case WALKING:
