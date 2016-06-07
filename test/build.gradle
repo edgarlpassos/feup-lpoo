@@ -14,12 +14,13 @@ allprojects {
 
     version = '1.0'
     ext {
-        appName = "LPOO_Proj2"
+        appName = "INSIDE THE DEATH STAR"
         gdxVersion = '1.9.2'
         roboVMVersion = '1.12.0'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
+        junitVersion = '4.12'
     }
 
     repositories {
@@ -66,6 +67,7 @@ project(":android") {
 project(":core") {
     apply plugin: "java"
 
+    sourceSets.test.java.srcDirs = ["test/"]
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"

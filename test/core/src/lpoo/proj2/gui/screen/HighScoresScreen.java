@@ -84,15 +84,15 @@ public class HighScoresScreen extends MyScreen{
 
     @Override
     public void update(float delta) {
-        handleInput();
         stage.act();
+        handleInput();
     }
 
     @Override
     public void handleInput() {
 
         if(exitButton.isPressed()){
-            game.gsm.set(new GameState(new MainMenuScreen(game),game.gsm));
+            game.gsm.pop();
         }
     }
 
@@ -135,6 +135,7 @@ public class HighScoresScreen extends MyScreen{
 
     @Override
     public void dispose() {
-
+        stage.dispose();
+        background.dispose();
     }
 }

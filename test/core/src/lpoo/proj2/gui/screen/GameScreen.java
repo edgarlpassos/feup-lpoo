@@ -19,9 +19,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-
 import lpoo.proj2.*;
 import lpoo.proj2.gui.Hud;
+import lpoo.proj2.gui.PlayerSprite;
 import lpoo.proj2.logic.Player;
 import lpoo.proj2.logic.WorldContactListener;
 import lpoo.proj2.logic.Key;
@@ -29,38 +29,109 @@ import lpoo.proj2.logic.states.GameState;
 
 
 /**
- * Created by epassos on 5/13/16.
+ * Created by Antonio Melo and Edgar Passos
+ */
+
+/**
+ * Class used when the application is in the game mode
  */
 public class GameScreen extends MyScreen {
 
+    /**
+     * id of the ground layer in the tmx map
+     */
     private static final int groundid = 22;
+
+    /**
+     * id of the lava layer in the tmx map
+     */
     private static final int lavaid = 23;
+
+    /**
+     * id of the door layer in the tmx map
+     */
     private static final int doorid = 24;
+
+    /**
+     * id of the key layer in the tmx map
+     */
     private static final int keyid = 25;
+
+    /**
+     * id of the climbable layer in the tmx map
+     */
     private static final int climbableid = 26;
 
+    /**
+     * Box2d physics world
+     */
     private World world;
+
+    /**
+     * Screen camera
+     */
     private OrthographicCamera cam;
+
+    /**
+     * Screen viewport
+     */
     private Viewport vport;
+
+    /**
+     * Texture pack
+     */
     private TextureAtlas textures;
+
+    /**
+     * Screen HUD, displays the input buttons
+     */
     private Hud hud;
 
+    /**
+     * Used to snap cameras to new position
+     */
     public enum Switch {UP, DOWN, LEFT, RIGHT};
 
     //Map variables
+    /**
+     * Renders the tiled map
+     */
     private OrthogonalTiledMapRenderer rend;
+
+    /**
+     * Game map
+     */
     private TiledMap map;
+
+    /**
+     * map loader
+     */
     private TmxMapLoader mapLoader;
+
+
     //Box2d
-    private Box2DDebugRenderer b2dr;
+    private Box2DDebugRenderer b2dr; //TODO remove
 
     //Player
+    /**
+     * Player character
+     */
     public Player player;
+
+    /**
+     * Key used to finish the level
+     */
     private Key key;
     public TimeUtils timer;
     public long score_time;
 
 
+    /**
+     * Constructor of the Game Screen, changes the music, initializes the variables and the physics world
+     * and loads the map
+     *
+     * @param game current game
+     */
     public GameScreen(lpooGame game) {
         super(game);
         lpooGame.music.stop();
@@ -74,8 +145,10 @@ public class GameScreen extends MyScreen {
         cam.setToOrtho(false,vport.getWorldWidth(),vport.getWorldHeight());
         textures = new TextureAtlas("sp.pack");
         hud = new Hud(game.batch, this);
-        world = new World(new Vector2(0, -10), true);
-        player = new Player(this);
+        player = new Player();
+        PlayerSprite sprite = new PlayerSprite(this,player);
+        player.setPlayerSprite(sprite);
+        world = player.world;
         key = null;
         world.setContactListener(new WorldContactListener(player));
         loadmap();
@@ -84,6 +157,9 @@ public class GameScreen extends MyScreen {
 
     }
 
+    /**
+     * loads the tiled map and defines all its components in the box2d world
+     */
     public void loadmap(){
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("Map/Map.tmx");
@@ -175,13 +251,16 @@ public class GameScreen extends MyScreen {
 
     @Override
     public void show() {
+        //Do nothing
     }
 
     @Override
     public void render(float delta){
+        Gdx.input.setInputProcessor(hud.stage);
+
         Gdx.app.log("Render", "GameState");
         rend.render();
-        //b2dr.render(world,cam.combined);
+        b2dr.render(world,cam.combined); //TODO remove
 
         update(delta);
         game.batch.setProjectionMatrix(vport.getCamera().combined);
@@ -194,32 +273,31 @@ public class GameScreen extends MyScreen {
 
     @Override
     public void resize(int width, int height) {
-
+        //Do nothing
     }
 
     @Override
     public void pause() {
-
+        //Do nothing
     }
 
     @Override
     public void resume() {
-
+        //Do nothing
     }
 
     @Override
     public void hide() {
-
+        //Do nothing
     }
 
     @Override
     public void dispose() {
-
+        //// TODO: 6/7/16
     }
 
     public void update(float delta) {
-        handleInput();
-        hud.update(delta);
+        hud.update();
 
         if(player.asEscaped()){
             score_time = timer.timeSinceMillis(score_time);
@@ -243,78 +321,13 @@ public class GameScreen extends MyScreen {
         world.step(1 / 60f, 6, 2);
     }
 
-    public void handleInput() {
+
+    public void handleInput() {/**
         Gdx.input.setInputProcessor(hud.stage);
         if(hud.pressedPause()){
             hud.getStage().act();
             game.gsm.push(new GameState(new Pause(game),game.gsm));
-        }
-
-
-        //Walking animations
-        if (hud.walkEnabled()) {
-
-            if (hud.pressedRight()) {
-                if (player.isFacingRight()) {
-                    if (hud.pressedA()) {   //long jump
-                        player.jump();
-                    }
-                    player.walk();
-                }
-                //facing left, turn around
-                else player.turn();
-            }
-            else if (hud.pressedLeft()) {
-                if (!player.isFacingRight()) {
-                    if (hud.pressedA()) {   //long jump
-                        player.jump();
-                    }
-                    player.walk();
-                //facing right, turn around
-                } else player.turn();
-
-            } else if (hud.pressedA()) {   //long jump
-                player.climb();
-            } else player.stop();
-
-        //Running animations
-        } else {
-            if (hud.pressedRight()) {
-                if(player.isFacingRight()){
-                    if(hud.pressedA())
-                        player.jump();
-
-                    else player.run();
-                //facing left, turn  around
-                } else {
-                    player.turn();
-                }
-            }
-
-            else if(hud.pressedLeft()){
-                if(!player.isFacingRight()) {
-                    if (hud.pressedA())
-                        player.jump();
-                    else player.run();
-                }
-                //facing right, turn around
-                else {
-                    player.turn();
-                }
-
-            }
-
-            else if(hud.pressedA()){
-                player.climb();
-            }
-
-            else player.stop();
-        }
-
-        if(hud.soundPressed()){
-            toggleMusic();
-        }
-    }
+        */}
 
     public TextureAtlas getTextures() {
         return textures;
@@ -349,4 +362,5 @@ public class GameScreen extends MyScreen {
     public OrthographicCamera getCam(){
         return cam;
     }
+
 }

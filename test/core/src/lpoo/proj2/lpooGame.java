@@ -12,13 +12,22 @@ import lpoo.proj2.gui.screen.MyScreen;
 import lpoo.proj2.logic.states.GameState;
 import lpoo.proj2.logic.states.GameStateManager;
 
+/**
+ * main class of the project
+ */
 public class lpooGame extends Game {
 
 
-    public SpriteBatch batch;
     public static final int WIDTH = 1400;
     public static final int HEIGHT = 700;
+
+    /**
+     *  Used for the interaction with the tile, tiles are 70x70 px
+     *  PPM = pixels per meter
+     */
     public static final float PPM = 70;
+
+    public SpriteBatch batch;
     public GameStateManager gsm;
     public static Music music = null;
     public static float[] scores;
@@ -39,7 +48,7 @@ public class lpooGame extends Game {
         //Main Menu creation
         MyScreen menu_screen = new MainMenuScreen(this);
         GameState main_menu = new GameState(menu_screen,gsm);
-        gsm.push(main_menu);
+        gsm.push(main_menu);    //Starts game with main menu
     }
 
     @Override

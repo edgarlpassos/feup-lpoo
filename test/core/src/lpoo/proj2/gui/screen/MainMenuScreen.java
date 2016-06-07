@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -24,7 +26,7 @@ import lpoo.proj2.logic.states.GameState;
 import lpoo.proj2.lpooGame;
 
 /**
- * Created by epassos on 6/4/16.
+ * Created by Antonio Melo and Edgar Passos on 6/4/16.
  */
 public class MainMenuScreen extends  MyScreen{
 
@@ -43,6 +45,7 @@ public class MainMenuScreen extends  MyScreen{
 
     public MainMenuScreen(lpooGame game){
         super(game);
+        Table table = new Table();
 
         if(lpooGame.music != null) lpooGame.music.stop();
         lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/star_wars.mp3"));
@@ -74,7 +77,39 @@ public class MainMenuScreen extends  MyScreen{
         subtitle = new Label("inside THE DEATH STAR",titleStyle);
 
 
-        Table table = new Table();
+
+
+        final lpooGame g = game;
+        InputListener playListener = new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                g.gsm.push(new GameState(new GameScreen(g),g.gsm));
+            }
+        };
+        InputListener highscoreListener = new InputListener(){
+
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+               g.gsm.push(new GameState(new HighScoresScreen(g),g.gsm));
+            }
+        };
+
+        playButton.addListener(playListener);
+        highScores.addListener(highscoreListener);
+
+        stage.addActor(table);
+
         table.setFillParent(true);
         table.setDebug(false);
         table.add(title).expandX().align(Align.center).colspan(3);
@@ -85,7 +120,6 @@ public class MainMenuScreen extends  MyScreen{
         table.add(highScores).align(Align.center);
         table.add(playButton).align(Align.center);
 
-        stage.addActor(table);
     }
 
     @Override
@@ -132,8 +166,8 @@ public class MainMenuScreen extends  MyScreen{
     @Override
     public void update(float delta) {
         Gdx.input.setInputProcessor(stage);
-        handleInput();
         stage.act();
+        handleInput();
     }
 
     @Override
@@ -146,8 +180,5 @@ public class MainMenuScreen extends  MyScreen{
             Gdx.app.exit();
         }
 
-        if(highScores.isPressed()){
-            game.gsm.set(new GameState(new HighScoresScreen(game),game.gsm));
-        }
     }
 }

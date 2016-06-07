@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 
 /**
- * Created by Antonio on 05-Jun-16.
+ * Created by Antonio Melo and Edgar Passos
  */
 public class WorldContactListener implements ContactListener {
     private Player p;
@@ -38,7 +38,7 @@ public class WorldContactListener implements ContactListener {
             }
 
             if (obj.getUserData() == "climbable"){
-                if(p.getCurrentState() == Player.State.CLIMB_JUMP || p.getCurrentState() == Player.State.RUN_JUMP || p.getCurrentState() == Player.State.LONG_JUMP)
+                if(p.getCurrentState() == Player.State.CLIMB_JUMP || p.getCurrentState() == Player.State.RUN_JUMP || p.getCurrentState() == Player.State.LONG_JUMP || p.getCurrentState() == Player.State.FALLING)
                     p.hang();
             }
 

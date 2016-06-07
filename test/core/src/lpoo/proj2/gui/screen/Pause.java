@@ -1,12 +1,15 @@
 package lpoo.proj2.gui.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -59,11 +62,38 @@ public class Pause extends MyScreen{
         BitmapFont titleFont = new BitmapFont(Gdx.files.internal("font_title.fnt"),false);
         Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont,Color.GOLD);
 
+        final lpooGame g = game;
+        InputListener replayListener = new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                g.gsm.pop();
+            }
+        };
+
+        InputListener exitListener = new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                g.gsm.pop();
+                g.gsm.set(new GameState(new MainMenuScreen(g),g.gsm));
+            }
+        };
 
         playAgainButton = new TextButton("resume",style);
-        exitButton = new TextButton("BACK",style);
+        exitButton = new TextButton("Main Menu",style);
         menssage = new Label("game paused",titleStyle);
 
+        playAgainButton.addListener(replayListener);
+        exitButton.addListener(exitListener);
 
         Table table = new Table();
         table.setFillParent(true);
@@ -80,21 +110,12 @@ public class Pause extends MyScreen{
 
     @Override
     public void update(float delta) {
-        handleInput();
         stage.act();
+        handleInput();
     }
 
     @Override
     public void handleInput() {
-        if(playAgainButton.isPressed()){
-            game.gsm.pop();
-            //game.gsm.pop();
-        }
-
-        if(exitButton.isPressed()){
-            game.gsm.set(new GameState(new MainMenuScreen(game),game.gsm));
-        }
-
     }
 
     @Override
