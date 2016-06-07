@@ -103,7 +103,7 @@ public class EndGameScreen extends  MyScreen{
     @Override
     public void handleInput() {
         if(playAgainButton.isPressed()){
-            game.gsm.set(new GameState(new GameScreen(game),game.gsm));
+            game.gsm.set(new GameState(new GameScreen(game,"Map/Map.tmx"),game.gsm));
         }
 
         if(exitButton.isPressed()){

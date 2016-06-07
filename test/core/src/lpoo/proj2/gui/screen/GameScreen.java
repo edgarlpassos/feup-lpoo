@@ -122,6 +122,9 @@ public class GameScreen extends MyScreen {
      * Key used to finish the level
      */
     private Key key;
+
+    private String mapName;
+
     public TimeUtils timer;
     public long score_time;
 
@@ -132,8 +135,9 @@ public class GameScreen extends MyScreen {
      *
      * @param game current game
      */
-    public GameScreen(lpooGame game) {
+    public GameScreen(lpooGame game, String mapName) {
         super(game);
+        this.mapName = mapName;
         lpooGame.music.stop();
         lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/game_music.mp3"));
         lpooGame.music.play();
@@ -162,7 +166,7 @@ public class GameScreen extends MyScreen {
      */
     public void loadmap(){
         mapLoader = new TmxMapLoader();
-        map = mapLoader.load("Map/Map.tmx");
+        map = mapLoader.load(mapName);
 
         rend = new OrthogonalTiledMapRenderer(map,1/lpooGame.PPM);
         b2dr = new Box2DDebugRenderer();

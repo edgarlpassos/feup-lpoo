@@ -88,7 +88,7 @@ public class MainMenuScreen extends  MyScreen{
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                g.gsm.push(new GameState(new GameScreen(g),g.gsm));
+                g.gsm.push(new GameState(new GameScreen(g,"Map/Map.tmx"),g.gsm));
             }
         };
         InputListener highscoreListener = new InputListener(){
@@ -173,7 +173,7 @@ public class MainMenuScreen extends  MyScreen{
     @Override
     public void handleInput() {
         if(playButton.isPressed()){
-            game.gsm.set(new GameState(new GameScreen(game),game.gsm));
+            game.gsm.set(new GameState(new GameScreen(game,"Map/Map.tmx"),game.gsm));
         }
 
         if(exitButton.isPressed()){
