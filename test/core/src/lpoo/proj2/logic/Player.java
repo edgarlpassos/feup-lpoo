@@ -16,6 +16,10 @@ import lpoo.proj2.lpooGame;
 /**
  * Created by Antonio Melo and Edgar Passos
  */
+
+/**
+ * Class used to represent the player character
+ */
 public class Player extends Sprite {
 
     public enum State {

@@ -283,12 +283,12 @@ public class GameScreen extends MyScreen {
 
     @Override
     public void dispose() {
-        //// TODO: 6/7/16  
+        //// TODO: 6/7/16
     }
 
     public void update(float delta) {
         handleInput();
-        hud.update(delta);
+        hud.update();
 
         if(player.hasKey() && key.getBody() != null){
             world.destroyBody(key.getBody());
