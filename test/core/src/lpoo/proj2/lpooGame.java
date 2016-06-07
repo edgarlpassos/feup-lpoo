@@ -25,6 +25,7 @@ public class lpooGame extends Game {
      *  PPM = pixels per meter
      */
     public static final float PPM = 70;
+
     public SpriteBatch batch;
     public GameStateManager gsm;
     public static Music music = null;

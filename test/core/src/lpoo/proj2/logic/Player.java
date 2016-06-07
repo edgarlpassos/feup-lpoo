@@ -2,7 +2,9 @@ package lpoo.proj2.logic;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import lpoo.proj2.gui.PlayerSprite;
 import lpoo.proj2.gui.screen.GameScreen;
 import lpoo.proj2.lpooGame;
 
@@ -20,7 +23,7 @@ import lpoo.proj2.lpooGame;
 /**
  * Class used to represent the player character
  */
-public class Player extends Sprite {
+public class Player {
 
     public enum State {
         IDLE, START_RUN, RUNNING, STOP, TURNING, TURNING_RUN, RUN_JUMP, LONG_JUMP, FALLING,
@@ -38,82 +41,6 @@ public class Player extends Sprite {
      */
     public Body body;
 
-    /**
-     * Screen to which the player belongs
-     */
-    private GameScreen screen;
-
-    //Textures and Animations
-
-    /**
-     * Default animation used for when there are no actions
-     */
-    private Animation idle;
-
-    /**
-     * Animation used when the player is falling
-     */
-    private Animation falling;
-
-    /**
-     * Animation used when the player is dead after falling
-     */
-    private Animation fall_death;
-
-    /**
-     * Animation used when the player is running
-     */
-    private Animation running;
-
-    /**
-     * Animation used when the player starts running
-     */
-    private Animation start_run;
-
-    /**
-     * Animation used when the player stops
-     */
-    private Animation stop_run;
-
-    /**
-     * Animation used when the player performs a running jump
-     */
-    private Animation running_jump;
-
-    /**
-     * Animation used when the player is walking
-     */
-    private Animation walking;
-
-    /**
-     * Animation used when the player performs a standing long jump
-     */
-    private Animation long_jump;
-
-    /**
-     * Animation used when the player turns around
-     */
-    private Animation turn;
-
-    /**
-     * Animation used when the player turns around while running
-     */
-    private Animation run_turn;
-
-    /**
-     * Animation used when the player jumps to climb a ledge
-     */
-    private Animation climb_jump;
-
-    /**
-     * Animation used when the player is hanging from a ledge
-     */
-    private Animation hanging;
-
-    /**
-     * Animation used when the player climbs up from a ledge
-     */
-    private Animation climb_up;
 
     //States
 
@@ -132,13 +59,9 @@ public class Player extends Sprite {
      */
     private State previousState;
 
-    /**
-     * Current player Animation
-     */
-    private Animation currentAnimation;
 
     /**
-     * True if the player sprite is facing right
+     * True if the player is facing right
      */
     private boolean facingRight;
 
@@ -174,17 +97,25 @@ public class Player extends Sprite {
     private boolean hasKey;
 
     /**
-     * Constructor for the Player class
-     * @param screen Screen in which the player is drawn
-     *
-     *               Initializes all the variables and loads the animations, also sets the initial position
+     * Sprite that is drawn
      */
-    public Player(GameScreen screen) {
-        super(screen.getTextures().findRegion("playersprites"));
-        this.world = screen.getWorld();
-        this.screen = screen;
+    private PlayerSprite playerSprite;
+
+    public static final float STOP_TIME = 0.6f;
+    public static final float TURNING_TIME = 0.6f;
+    public static final float WALK_TIME = 0.7f;
+    public static final float CLIMB_UP_TIME = 1f;
+    public static final float CLIMB_JUMP_TIME = 1.1f;
+//    public static final float
+
+    /**
+     * Constructor for the Player class
+     * Initializes all the variables and loads the animations, also sets the initial position
+     */
+    public Player() {
         alive = true;
         hasKey = false;
+        world = new World(new Vector2(0,-10f),false);
         definePlayer();
 
         //Initial status
@@ -194,110 +125,8 @@ public class Player extends Sprite {
         yVel = 0;
         maxyVel = 0;
         prevyVel = 0;
-
-
-        Array<TextureRegion> frames = new Array<TextureRegion>();
-
-        //idle sprite
-        frames.add(new TextureRegion(getTexture(), 0, 350, 18, 40));
-        idle = new Animation(0.1f, frames, Animation.PlayMode.LOOP);
-        frames.clear();
-
-        currentAnimation = idle;
-
-        //start_run animation
-        for (int i = 0; i < 14; i++) {
-            frames.add(new TextureRegion(getTexture(), (i * 30), 0, 30, 40));
-        }
-        start_run = new Animation(0.1f, frames);
-        frames.clear();
-
-        //run cycle animation
-        for (int i = 0; i < 8; i++) {
-            frames.add(new TextureRegion(getTexture(), (i * 31), 50, 31, 40));
-        }
-        running = new Animation(0.1f, frames, Animation.PlayMode.LOOP);
-        frames.clear();
-
-
-        //run stop animation
-        for (int i = 0; i < 6; i++) {
-            frames.add(new TextureRegion(getTexture(), (i * 37), 100, 37, 40));
-        }
-        stop_run = new Animation(0.1f, frames);
-        frames.clear();
-
-
-        //running jump animation
-        for (int i = 0; i < 10; i++) {
-            frames.add(new TextureRegion(getTexture(), (i * 47), 150, 47, 40));
-        }
-        running_jump = new Animation(0.1f, frames);
-        frames.clear();
-
-
-        //walking animation
-        for (int i = 0; i < 7; i++) {
-            frames.add(new TextureRegion(getTexture(), i * 26, 200, 26, 40));
-        }
-        walking = new Animation(0.1f, frames, Animation.PlayMode.LOOP);
-        frames.clear();
-
-        //long jump
-        for (int i = 0; i < 14; i++) {
-            frames.add(new TextureRegion(getTexture(), i * 48, 250, 48, 40));
-        }
-        long_jump = new Animation(0.1f, frames);
-        frames.clear();
-
-        //turning left
-        for (int i = 0; i < 6; i++) {
-            frames.add(new TextureRegion(getTexture(), i * 18, 300, 18, 40));
-        }
-        turn = new Animation(0.1f, frames);
-        frames.clear();
-
-        //running turn animations
-        for (int i = 0; i < 11; i++) {
-            frames.add(new TextureRegion(getTexture(), i * 33, 350, 33, 40));
-        }
-        run_turn = new Animation(0.1f, frames);
-        frames.clear();
-
-        //jump to climb animation
-        for (int i = 0; i < 12; i++) {
-            frames.add(new TextureRegion(getTexture(), i * 20, 450, 20, 48));
-        }
-        climb_jump = new Animation(0.1f, frames);
-        frames.clear();
-
-        //hanging animation
-        for (int i = 0; i < 13; i++) {
-            frames.add(new TextureRegion(getTexture(), i * 26, 500, 26, 45));
-        }
-        hanging = new Animation(0.1f, frames, Animation.PlayMode.LOOP);
-        frames.clear();
-
-        //climb up animation
-        for (int i = 0; i < 12; i++) {
-            frames.add(new TextureRegion(getTexture(), i * 30, 550, 30, 83));
-        }
-        climb_up = new Animation(0.1f, frames);
-        frames.clear();
-
-
-        //falling animation
-        frames.add(new TextureRegion(getTexture(), 0, 650, 17, 36));
-        falling = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
-        frames.clear();
-
-        //death by fall damage animation
-        frames.add(new TextureRegion(getTexture(), 0, 650, 17, 36));
-        fall_death = new Animation(0.1f,frames, Animation.PlayMode.LOOP);
-        frames.clear();
-
-        setPosition(1400 * 6f + 200, 700 * 2f + 700);
         elapsedTime = 0;
+        playerSprite = null;
     }
 
     /**
@@ -322,6 +151,12 @@ public class Player extends Sprite {
         body.createFixture(fdef).setUserData("player");
     }
 
+    public void setPlayerSprite(PlayerSprite sprite){
+        //System.out.println(currentState);
+        this.playerSprite = sprite;
+        playerSprite.setCurrentAnimation(currentState);
+    }
+
     /**
      * Updates all the info of the player, the camera and its movement according to the state it is currently in.
      *
@@ -330,6 +165,8 @@ public class Player extends Sprite {
     public void update(float dt) {
 
         int direction = facingRight ? 1 : -1;
+        elapsedTime+=dt;
+        playerSprite.update(dt);
 
 
         prevyVel = yVel;
@@ -340,46 +177,27 @@ public class Player extends Sprite {
         //Player is falling
         if (yVel < -3f && currentState != State.FALLING && currentState != State.LONG_JUMP) {
             changeState(State.FALLING);
-            setCurrentAnimation(falling);
         }
 
         else if (yVel < -4f && currentState != State.FALLING ) {
             changeState(State.FALLING);
-            setCurrentAnimation(falling);
         }
 
         //Player just ended a fall, checks if its velocity was fast enough to kill him
         if(yVel == 0f && currentState == State.FALLING){
             if(prevyVel > 10){
-                setCurrentAnimation(fall_death);
+                changeState(State.DEAD);
                 isKilled();
             }
 
             //if not, handle it like any other stop in motion
-            else stop();
+            else {
+                stop();
+                return;
+            }
         }
 
-        //Sets the new position of the box2d body to follow the player sprite
-        if (currentAnimation == climb_up) {
-            setPosition(facingRight ? (body.getPosition().x) : body.getPosition().x - getWidth(), (body.getPosition().y - getHeight() / 4));
-        } else
-            setPosition((body.getPosition().x - getWidth() / 2), (body.getPosition().y - getHeight() / 2));
-        setRegion(getFrame(dt));
 
-
-        //Checks if the player has left the view of the camera and, if so, snaps it to a new position
-        if (body.getPosition().y < screen.getCam().position.y - screen.getCam().viewportHeight / 2) {
-            screen.switchCamera(GameScreen.Switch.DOWN);
-        }
-        if (body.getPosition().y > screen.getCam().position.y + screen.getCam().viewportHeight / 2) {
-            screen.switchCamera(GameScreen.Switch.UP);
-        }
-        if (body.getPosition().x < screen.getCam().position.x - screen.getCam().viewportWidth / 2) {
-            screen.switchCamera(GameScreen.Switch.LEFT);
-        }
-        if (body.getPosition().x > screen.getCam().position.x + screen.getCam().viewportWidth / 2) {
-            screen.switchCamera(GameScreen.Switch.RIGHT);
-        }
 
         //Checks the state of the player and moves it accordingly
         switch (currentState) {
@@ -393,9 +211,9 @@ public class Player extends Sprite {
                 break;
 
             case STOP:
-                if (stop_run.isAnimationFinished(elapsedTime) ) {
+                if (elapsedTime > STOP_TIME ) {
                 }
-                else body.applyForceToCenter(-body.getLinearVelocity().x * stop_run.getAnimationDuration() * lpooGame.PPM, 0, true); // acceleration needed to stop the body
+                else body.applyForceToCenter(-body.getLinearVelocity().x * STOP_TIME * lpooGame.PPM, 0, true); // acceleration needed to stop the body
                 break;
 
             case RUN_JUMP:
@@ -406,13 +224,16 @@ public class Player extends Sprite {
                     body.applyForceToCenter(direction * 700f / lpooGame.PPM, 750f / lpooGame.PPM, true);
                 }
 
-                else
+                else if (elapsedTime < 0.9f)
                     body.applyForceToCenter(direction * -6 * 700f / lpooGame.PPM, -6 * 750f / lpooGame.PPM, true);
+                else {
+                    changeState(State.RUNNING);
+                }
                 break;
 
             case WALKING:
-                if (elapsedTime <= 0.2f || elapsedTime >= 0.5) {
-                } else body.applyForceToCenter(direction * 500f / lpooGame.PPM, 0f, true);
+                if (elapsedTime > 0.2f || elapsedTime < 0.5)
+                    body.applyForceToCenter(direction * 500f / lpooGame.PPM, 0f, true);
 
                 break;
 
@@ -421,7 +242,8 @@ public class Player extends Sprite {
                 } else if (elapsedTime >= 0.8f) {
                     body.applyForceToCenter(direction * -1750f / lpooGame.PPM, -1000f / lpooGame.PPM, true);
                 } else body.applyForceToCenter(direction * 2500f / lpooGame.PPM, 1000f / lpooGame.PPM, true);
-                if(long_jump.isAnimationFinished(elapsedTime))
+
+                if(elapsedTime > 1.3f)
                     stop();
                 break;
 
@@ -429,7 +251,7 @@ public class Player extends Sprite {
                 break;
 
             case TURNING_RUN:
-                while (!run_turn.isAnimationFinished(elapsedTime)) {
+                while (elapsedTime <= 1f) {
                     body.applyForceToCenter(direction * -10f / lpooGame.PPM, 0, true);
                 }
                 break;
@@ -445,10 +267,20 @@ public class Player extends Sprite {
 
             case CLIMBING_UP:
                 body.applyForceToCenter(0, -2 * world.getGravity().y, true);
+                if(elapsedTime > CLIMB_UP_TIME)
+                    stop();
+                break;
+
+            case FALLING:
+                break;
+
+            case TURNING:
+                if(elapsedTime > TURNING_TIME)
+                    changeState(State.IDLE);
                 break;
         }
 
-        System.out.println(currentState);
+       // System.out.println(elapsedTime);
     }
 
     /**
@@ -457,15 +289,16 @@ public class Player extends Sprite {
     public void run() {
         if (currentState == State.IDLE) {
             changeState(State.START_RUN);
-            setCurrentAnimation(start_run);
         } else if (currentState == State.START_RUN) { //Player had started running, go into the run cycle
             if (elapsedTime >= 0.6f) {
                 changeState(State.RUNNING);
-                setCurrentAnimation(running);
             }
-        } else { //Can be called for the jumps
-            if (currentAnimation.isAnimationFinished(elapsedTime)) {
-                setCurrentAnimation(running);
+        } else if (currentState == State.RUN_JUMP) { //Can be called for the jumps
+            if (elapsedTime > 0.9f) {
+                changeState(State.RUNNING);
+            }
+        } else if (currentState == State.LONG_JUMP) {
+            if (elapsedTime > 0.9f) {
                 changeState(State.RUNNING);
             }
         }
@@ -481,35 +314,42 @@ public class Player extends Sprite {
         switch (currentState) {
             case START_RUN:
                 if (elapsedTime >= 0.6f) {
-                    setCurrentAnimation(stop_run);
                     changeState(State.STOP);
                 }
                 break;
 
+            case WALKING:
+                if(elapsedTime >= WALK_TIME) {
+                    changeState(State.IDLE);
+                    body.setLinearVelocity(0, 0);
+                }
+                break;
+
+            case STOP:
+                if (elapsedTime >= STOP_TIME)
+                    changeState(State.IDLE);
+                break;
+
             case RUNNING:
-                setCurrentAnimation(stop_run);
+                if (elapsedTime >= STOP_TIME)
                 changeState(State.STOP);
                 break;
 
             case RUN_JUMP:
-                if (elapsedTime >= 0.9) {
-                    setCurrentAnimation(stop_run);
+                if (elapsedTime >= 0.9f) {
                     changeState(State.STOP);
                 }
                 break;
 
             case LONG_JUMP:
-                if (long_jump.isAnimationFinished(elapsedTime)) {
-                    setCurrentAnimation(stop_run);
+                if (elapsedTime >= 1.3f) {
                     changeState(State.STOP);
                 }
                 break;
 
             case TURNING_RUN:
-                if (run_turn.isAnimationFinished(elapsedTime)) {
-                    setCurrentAnimation(stop_run);
+                if (elapsedTime >= TURNING_TIME) {
                     changeState(State.STOP);
-                    //body.setLinearVelocity(0, 0);
                 }
                 break;
 
@@ -518,49 +358,37 @@ public class Player extends Sprite {
                 break;
 
             case CLIMBING_UP:
-                if(climb_up.isAnimationFinished(elapsedTime)){
-                    body.setTransform(getX()+getWidth()/2,getY()+getHeight(),0);
+                if(elapsedTime >= CLIMB_UP_TIME){
+                    body.setTransform(body.getPosition().x+ (facingRight ? 1 : -1) * 0.5f, body.getPosition().y + 2,0);//playerSprite.getX()+playerSprite.getWidth()/2,playerSprite.getY()+playerSprite.getHeight(),0);
                     changeState(State.IDLE);
-                    setCurrentAnimation(idle);
                 }
+                break;
+
+            case CLIMB_JUMP:
+                if(elapsedTime >= CLIMB_JUMP_TIME)
+                    changeState(State.IDLE);
+                break;
+
+            case FALLING:
+                if(yVel == 0)
+                    changeState(State.IDLE);
+                break;
+
+            case IDLE:
+                break;
+
+            case TURNING:
+                if(elapsedTime > TURNING_TIME)
+                    changeState(State.IDLE);
                 break;
 
             default:
-                if (currentAnimation == null || currentAnimation.isAnimationFinished(elapsedTime)) {
-                    changeState(State.IDLE);
-                    setCurrentAnimation(idle);
-                }
+                changeState(State.IDLE);
                 break;
         }
     }
 
-    /**
-     * Function used to define the current sprite for the player
-     * @param dt time since last update
-     * @return the image of the current sprite
-     *
-     * Flips the image horizontally if needed (player facing left)
-     */
-    public TextureRegion getFrame(float dt) {
 
-        TextureRegion frame = idle.getKeyFrame(0);
-
-
-        if (elapsedTime >= currentAnimation.getAnimationDuration())
-            elapsedTime = 0;
-        frame = currentAnimation.getKeyFrame(elapsedTime);
-
-        if (!facingRight) {
-            elapsedTime += dt;
-            TextureRegion flipped = new TextureRegion(frame);
-            flipped.flip(true, false);
-            return flipped;
-        }
-
-        elapsedTime += dt;
-        return frame;
-
-    }
 
     /**
      * Function used to make the player jump
@@ -569,16 +397,21 @@ public class Player extends Sprite {
     public void jump() {
         if (currentState == State.RUNNING) {
             changeState(State.RUN_JUMP);
-            setCurrentAnimation(running_jump);
+            return;
         } else if (currentState == State.WALKING) {
-            // if (walking.isAnimationFinished(elapsedTime)) {
             changeState(State.LONG_JUMP);
-            setCurrentAnimation(long_jump);
-            //}
-        } else if (currentState == State.IDLE) {
-            changeState(State.LONG_JUMP);
-            setCurrentAnimation(long_jump);
+            return;
         }
+
+        else if (currentState == State.IDLE ) {
+            changeState(State.CLIMB_JUMP);
+        }
+
+       else if (currentState == State.HANGING) {
+            changeState(State.CLIMBING_UP);
+        }
+
+        System.out.println("Jump animation");
     }
 
     /**
@@ -587,16 +420,16 @@ public class Player extends Sprite {
     public void walk() {
 
         if (currentState == State.TURNING) {
-            if (turn.isAnimationFinished(elapsedTime)) {
+            if (elapsedTime >= 1f) {
                 changeState(State.WALKING);
-                setCurrentAnimation(walking);
             }
         } else if (currentState == State.WALKING) {
-            changeState(State.WALKING);
-            setCurrentAnimation(walking);
+            if (elapsedTime > 0.2f && elapsedTime < 0.5)
+                body.applyForceToCenter(facingRight ? 1 : -1 * 200f / lpooGame.PPM, 0f, true);
+            else if (elapsedTime > WALK_TIME)
+                stop();
         } else if (currentState == State.IDLE) {
             changeState(State.WALKING);
-            setCurrentAnimation(walking);
         }
     }
 
@@ -605,25 +438,27 @@ public class Player extends Sprite {
      */
     public void turn() {
         if (currentState == State.WALKING) {
-            if (walking.isAnimationFinished(elapsedTime)) {
+            if (elapsedTime >= 0.6f) {
                 changeState(State.TURNING);
-                setCurrentAnimation(turn);
                 facingRight = !facingRight;
             }
         } else if (currentState == State.IDLE) {
             changeState(State.TURNING);
-            setCurrentAnimation(turn);
             facingRight = !facingRight;
         } else if (currentState == State.RUNNING) {
             changeState(State.TURNING_RUN);
-            setCurrentAnimation(run_turn);
             facingRight = !facingRight;
         } else if (currentState == State.RUN_JUMP) {
-            if (running_jump.isAnimationFinished(elapsedTime)) {
+            if (elapsedTime >= 0.9f) {
                 changeState(State.TURNING_RUN);
-                setCurrentAnimation(run_turn);
                 facingRight = !facingRight;
             }
+        } else if (currentState == State.TURNING){
+            if(elapsedTime > TURNING_TIME){
+                changeState(State.IDLE);
+                body.setLinearVelocity(0,0);
+            }
+
         }
     }
 
@@ -631,14 +466,12 @@ public class Player extends Sprite {
      * Used to make the player climb ledges, goes into a jumping animation if the player was on the ground, and into a climbing up animation if the player was hanging
      */
     public void climb() {
-        if (currentState == State.IDLE || currentState == State.WALKING) {
+        if (currentState == State.IDLE ) {
             changeState(State.CLIMB_JUMP);
-            setCurrentAnimation(climb_jump);
         }
 
         if (currentState == State.HANGING) {
             changeState(State.CLIMBING_UP);
-            setCurrentAnimation(climb_up);
         }
     }
 
@@ -648,7 +481,6 @@ public class Player extends Sprite {
     public void hang() {
         if (currentState != State.HANGING && previousState != State.HANGING) {
             changeState(State.HANGING);
-            setCurrentAnimation(hanging);
         }
     }
 
@@ -726,21 +558,19 @@ public class Player extends Sprite {
      * @param state state to switch to
      */
     public void changeState(State state) {
+        //System.out.println(state);
         previousState = currentState;
         currentState = state;
         elapsedTime = 0;
+
+        if(playerSprite!=null)
+            playerSprite.setCurrentAnimation(state);
     }
 
 
-    /**
-     * Change the animation, updates the corresponding variable and resizes the bounds of the sprite to maintain shape
-     * @param animation animation to switch to
-     */
-    public void setCurrentAnimation(Animation animation) {
-        currentAnimation = animation;
-        if (animation == climb_up) {
-            setBounds((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
-        } else
-            setBounds((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
+    public void draw(SpriteBatch batch){
+        if (playerSprite != null)
+            playerSprite.draw(batch);
     }
+
 }

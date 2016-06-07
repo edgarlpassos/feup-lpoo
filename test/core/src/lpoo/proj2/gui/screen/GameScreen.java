@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import lpoo.proj2.*;
 import lpoo.proj2.gui.Hud;
+import lpoo.proj2.gui.PlayerSprite;
 import lpoo.proj2.logic.Player;
 import lpoo.proj2.logic.WorldContactListener;
 import lpoo.proj2.logic.Key;
@@ -143,8 +144,10 @@ public class GameScreen extends MyScreen {
         cam.setToOrtho(false,vport.getWorldWidth(),vport.getWorldHeight());
         textures = new TextureAtlas("sp.pack");
         hud = new Hud(game.batch, this);
-        world = new World(new Vector2(0, -10), true);
-        player = new Player(this);
+        player = new Player();
+        PlayerSprite sprite = new PlayerSprite(this,player);
+        player.setPlayerSprite(sprite);
+        world = player.world;
         key = null;
         world.setContactListener(new WorldContactListener(player));
         loadmap();
@@ -308,6 +311,10 @@ public class GameScreen extends MyScreen {
 
     public void handleInput() {
 
+        if(hud.soundPressed()){
+            toggleMusic();
+        }
+
         //Walking animations
         if (hud.walkEnabled()) {
 
@@ -315,62 +322,74 @@ public class GameScreen extends MyScreen {
                 if (player.isFacingRight()) {
                     if (hud.pressedA()) {   //long jump
                         player.jump();
+                        return;
                     }
-                    player.walk();
+                    else player.walk();
+                    return;
                 }
                 //facing left, turn around
                 else player.turn();
+                return;
             }
             else if (hud.pressedLeft()) {
                 if (!player.isFacingRight()) {
                     if (hud.pressedA()) {   //long jump
                         player.jump();
                     }
-                    player.walk();
+                    else player.walk();
+                    return;
                 //facing right, turn around
                 } else player.turn();
+                return;
 
             } else if (hud.pressedA()) {   //long jump
-                player.climb();
+                player.jump();
+                return;
             } else player.stop();
+            return;
 
         //Running animations
         } else {
             if (hud.pressedRight()) {
                 if(player.isFacingRight()){
-                    if(hud.pressedA())
+                    if(hud.pressedA()) {
                         player.jump();
-
-                    else player.run();
+                        return;
+                    }else player.run();
                 //facing left, turn  around
                 } else {
                     player.turn();
+                    return;
                 }
             }
 
             else if(hud.pressedLeft()){
                 if(!player.isFacingRight()) {
-                    if (hud.pressedA())
+                    if (hud.pressedA()) {
                         player.jump();
+                        return;
+                    }
                     else player.run();
+                    return;
                 }
                 //facing right, turn around
                 else {
                     player.turn();
+                    return;
                 }
 
             }
 
             else if(hud.pressedA()){
-                player.climb();
+                player.jump();
+                return;
             }
 
             else player.stop();
+            return;
         }
 
-        if(hud.soundPressed()){
-            toggleMusic();
-        }
+
     }
 
     public TextureAtlas getTextures() {
