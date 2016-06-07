@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="20" height="10" tilewidth="70" tileheight="70" nextobjectid="16">
+ <layer name="Tile Layer 1" width="20" height="10">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup name="Ground">
+  <object id="1" x="0" y="0" width="1394" height="70"/>
+  <object id="3" x="2" y="76" width="66" height="622"/>
+  <object id="4" x="72.6667" y="632.667" width="694.667" height="62"/>
+  <object id="5" x="1332" y="76" width="64" height="550"/>
+  <object id="6" x="70" y="420" width="276" height="12"/>
+  <object id="8" x="70" y="464" width="240" height="22.6667"/>
+  <object id="14" x="981.333" y="632" width="416" height="66.6667"/>
+ </objectgroup>
+ <objectgroup name="Climable">
+  <object id="11" x="316" y="437.333" width="29.3333" height="21.3333"/>
+ </objectgroup>
+ <objectgroup name="Key">
+  <object id="12" x="1189.33" y="564" width="66.6667" height="62.6667"/>
+ </objectgroup>
+ <objectgroup name="Lava">
+  <object id="13" x="770.667" y="632" width="206.667" height="66.6667"/>
+ </objectgroup>
+</map>
