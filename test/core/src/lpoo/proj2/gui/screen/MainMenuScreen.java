@@ -23,7 +23,7 @@ import lpoo.proj2.logic.states.GameState;
 import lpoo.proj2.lpooGame;
 
 /**
- * Created by epassos on 6/4/16.
+ * Created by Antonio Melo and Edgar Passos on 6/4/16.
  */
 public class MainMenuScreen extends  MyScreen{
 

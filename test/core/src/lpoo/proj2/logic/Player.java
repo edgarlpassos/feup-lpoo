@@ -14,7 +14,7 @@ import lpoo.proj2.gui.screen.GameScreen;
 import lpoo.proj2.lpooGame;
 
 /**
- * Created by epassos on 5/13/16.
+ * Created by Antonio Melo and Edgar Passos
  */
 public class Player extends Sprite {
 
@@ -24,40 +24,150 @@ public class Player extends Sprite {
     }
 
 
-    public World world; //Box2d physics world
-    public Body body;   //Box2d physics body
-    private GameScreen screen;  //Screen to which the player belongs
+    /**
+     * Box2d physics world
+     */
+    public World world;
+
+    /**
+     * Box2d physics body
+     */
+    public Body body;
+
+    /**
+     * Screen to which the player belongs
+     */
+    private GameScreen screen;
 
     //Textures and Animations
-    private Animation idle;         //Default animation used for when there are no actions
-    private Animation falling;      //Animation used when the player is falling
-    private Animation fall_death;   //Animation used when the player is dead after falling
-    private Animation running;      //Animation used when the player is running
-    private Animation start_run;    //Animation used when the player starts running
-    private Animation stop_run;     //Animation used when the player stops
-    private Animation running_jump; //Animation used when the player performs a running jump
-    private Animation walking;      //Animation used when the player is walking
-    private Animation long_jump;    //Animation used when the player performs a standing long jump
-    private Animation turn;         //Animation used when the player turns around
-    private Animation run_turn;     //Animation used when the player turns around while running
-    private Animation climb_jump;   //Animation used when the player jumps to climb a ledge
-    private Animation hanging;      //Animation used when the player is hanging from a ledge
-    private Animation climb_up;     //Animation used when the player climbs up from a ledge
+
+    /**
+     * Default animation used for when there are no actions
+     */
+    private Animation idle;
+
+    /**
+     * Animation used when the player is falling
+     */
+    private Animation falling;
+
+    /**
+     * Animation used when the player is dead after falling
+     */
+    private Animation fall_death;
+
+    /**
+     * Animation used when the player is running
+     */
+    private Animation running;
+
+    /**
+     * Animation used when the player starts running
+     */
+    private Animation start_run;
+
+    /**
+     * Animation used when the player stops
+     */
+    private Animation stop_run;
+
+    /**
+     * Animation used when the player performs a running jump
+     */
+    private Animation running_jump;
+
+    /**
+     * Animation used when the player is walking
+     */
+    private Animation walking;
+
+    /**
+     * Animation used when the player performs a standing long jump
+     */
+    private Animation long_jump;
+
+    /**
+     * Animation used when the player turns around
+     */
+    private Animation turn;
+
+    /**
+     * Animation used when the player turns around while running
+     */
+    private Animation run_turn;
+
+    /**
+     * Animation used when the player jumps to climb a ledge
+     */
+    private Animation climb_jump;
+
+    /**
+     * Animation used when the player is hanging from a ledge
+     */
+    private Animation hanging;
+
+    /**
+     * Animation used when the player climbs up from a ledge
+     */
+    private Animation climb_up;
 
     //States
-    private float elapsedTime;                  //Time spent in the current state
-    private State currentState;                 //Current player state
-    private State previousState;                //Previous player state
-    private Animation currentAnimation;         //Current player Animation
-    private boolean facingRight;                //True if the player sprite is facing right
-    private static final float maxVelocity = 4; //Maximum velocity for the player movement
-    private float yVel;                         //Velocity for the player along the Y axis
-    private float maxyVel;                      //Maximum velocity recorded between non-zero Y velocities
-    private float prevyVel;                     //Velocity for the Y axis recorded before yVel
+
+    /**
+     * Time spent in the current state
+     */
+    private float elapsedTime;
+
+    /**
+     * Current player state
+     */
+    private State currentState;
+
+    /**
+     *  Previous player state
+     */
+    private State previousState;
+
+    /**
+     * Current player Animation
+     */
+    private Animation currentAnimation;
+
+    /**
+     * True if the player sprite is facing right
+     */
+    private boolean facingRight;
+
+    /**
+     * Maximum velocity for the horizontal player movement
+     */
+    private static final float MAX_VELOCITY = 4;
+
+    /**
+     * Velocity for the player along the Y axis
+     */
+    private float yVel;
+
+    /**
+     * Maximum velocity recorded during a fall
+     */
+    private float maxyVel;
+
+    /**
+     * Velocity for the Y axis recorded before yVel
+     */
+    private float prevyVel;
 
     //Logic variables
-    private boolean alive;                      //True if the player is alive
-    private boolean hasKey;                     //True if the player is in posession of the key
+    /**
+     * True if the player is alive
+     */
+    private boolean alive;
+
+    /**
+     * True if the player has the Key
+     */
+    private boolean hasKey;
 
     /**
      * Constructor for the Player class
@@ -274,7 +384,7 @@ public class Player extends Sprite {
                 break;
 
             case RUNNING:
-                if ((body.getLinearVelocity().x <= maxVelocity && facingRight) || (body.getLinearVelocity().x >= -maxVelocity && !facingRight))
+                if ((body.getLinearVelocity().x <= MAX_VELOCITY && facingRight) || (body.getLinearVelocity().x >= -MAX_VELOCITY && !facingRight))
                     body.applyForceToCenter(direction * 500f / lpooGame.PPM, 0f, true);
                 break;
 

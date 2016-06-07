@@ -6,11 +6,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -21,11 +19,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import java.lang.Math;
-
 import lpoo.proj2.*;
 import lpoo.proj2.gui.Hud;
 import lpoo.proj2.logic.Player;
@@ -34,38 +29,107 @@ import lpoo.proj2.logic.Key;
 
 
 /**
- * Created by epassos on 5/13/16.
+ * Created by Antonio Melo and Edgar Passos
+ */
+
+/**
+ * Class used when the application is in the game mode
  */
 public class GameScreen extends MyScreen {
 
+    /**
+     * id of the ground layer in the tmx map
+     */
     private static final int groundid = 22;
+
+    /**
+     * id of the lava layer in the tmx map
+     */
     private static final int lavaid = 23;
+
+    /**
+     * id of the door layer in the tmx map
+     */
     private static final int doorid = 24;
+
+    /**
+     * id of the key layer in the tmx map
+     */
     private static final int keyid = 25;
+
+    /**
+     * id of the climbable layer in the tmx map
+     */
     private static final int climbableid = 26;
 
+    /**
+     * Box2d physics world
+     */
     private World world;
+
+    /**
+     * Screen camera
+     */
     private OrthographicCamera cam;
+
+    /**
+     * Screen viewport
+     */
     private Viewport vport;
+
+    /**
+     * Texture pack
+     */
     private TextureAtlas textures;
+
+    /**
+     * Screen HUD, displays the input buttons
+     */
     private Hud hud;
 
-
-
+    /**
+     * Used to snap cameras to new position
+     */
     public enum Switch {UP, DOWN, LEFT, RIGHT};
 
     //Map variables
+    /**
+     * Renders the tiled map
+     */
     private OrthogonalTiledMapRenderer rend;
+
+    /**
+     * Game map
+     */
     private TiledMap map;
+
+    /**
+     * map loader
+     */
     private TmxMapLoader mapLoader;
+
+
     //Box2d
-    private Box2DDebugRenderer b2dr;
+    private Box2DDebugRenderer b2dr; //TODO remove
 
     //Player
+    /**
+     * Player character
+     */
     public Player player;
+
+    /**
+     * Key used to finish the level
+     */
     private Key key;
 
 
+    /**
+     * Constructor of the Game Screen, changes the music, initializes the variables and the physics world
+     * and loads the map
+     *
+     * @param game current game
+     */
     public GameScreen(lpooGame game) {
         super(game);
         lpooGame.music.stop();
@@ -86,6 +150,9 @@ public class GameScreen extends MyScreen {
         loadmap();
     }
 
+    /**
+     * loads the tiled map and defines all its components in the box2d world
+     */
     public void loadmap(){
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("Map/Map.tmx");
@@ -177,12 +244,13 @@ public class GameScreen extends MyScreen {
 
     @Override
     public void show() {
+        //Do nothing
     }
 
     @Override
     public void render(float delta){
         rend.render();
-        //b2dr.render(world,cam.combined);
+        //b2dr.render(world,cam.combined); TODO remove
 
         update(delta);
         game.batch.setProjectionMatrix(vport.getCamera().combined);
@@ -195,27 +263,27 @@ public class GameScreen extends MyScreen {
 
     @Override
     public void resize(int width, int height) {
-
+        //Do nothing
     }
 
     @Override
     public void pause() {
-
+        //Do nothing
     }
 
     @Override
     public void resume() {
-
+        //Do nothing
     }
 
     @Override
     public void hide() {
-
+        //Do nothing
     }
 
     @Override
     public void dispose() {
-
+        //// TODO: 6/7/16  
     }
 
     public void update(float delta) {

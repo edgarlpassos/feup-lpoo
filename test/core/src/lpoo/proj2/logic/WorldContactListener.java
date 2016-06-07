@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 
 /**
- * Created by Antonio on 05-Jun-16.
+ * Created by Antonio Melo and Edgar Passos
  */
 public class WorldContactListener implements ContactListener {
     private Player p;

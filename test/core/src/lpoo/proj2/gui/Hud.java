@@ -19,22 +19,65 @@ import lpoo.proj2.gui.screen.GameScreen;
 
 
 /**
- * Created by epassos on 5/31/16.
+ * Created by Antonio Melo and Edgar Passos
+ */
+
+/**
+ * Class used to display the input buttons on screen
  */
 public class Hud {
 
+    /**
+     * libgdx stage to hold the buttons
+     */
     public Stage stage;
+
+    /**
+     * stage viewport
+     */
     public Viewport viewport;
 
+    /**
+     * current game screen
+     */
     private GameScreen screen;
 
+    /**
+     * A button
+     */
     private Button buttonA;
+
+    /**
+     * B button
+     */
     private Button buttonB;
+
+    /**
+     * Walk switch
+     */
     private Button walkButton;
+
+    /**
+     * Left button
+     */
     private Button leftButton;
+
+    /**
+     * Right button
+     */
     private Button rightButton;
+
+    /**
+     * Sound button
+     */
     private Button sound;
 
+
+    /**
+     * Hud constructor, initializes the variables, loads the button images and sets up their layout
+     * @param batch game's sprite batch
+     * @param screen current game screen
+     */
     public Hud(SpriteBatch batch, final GameScreen screen) {
 
         this.screen = screen;
@@ -91,36 +134,70 @@ public class Hud {
         stage.addActor(table);
     }
 
-    public void update(float delta) {
+    /**
+     * updates all the buttons according to input
+     */
+    public void update() {
         stage.act();
     }
 
+    /**
+     * Poll the A button
+     * @return true if the A button is pressed
+     */
     public boolean pressedA() {
         return buttonA.isPressed();
     }
 
+    /**
+     * Poll the B button
+     * @return true if the B button is pressed
+     */
     public boolean pressedB() {
         return buttonB.isPressed();
     }
 
+    /**
+     * Poll the left button
+     * @return true if the left button is pressed
+     */
     public boolean pressedLeft() {
         return leftButton.isPressed();
     }
 
+    /**
+     * Poll the Right button
+     * @return true if the Right button is pressed
+     */
     public boolean pressedRight() {
         return rightButton.isPressed();
     }
 
+    /**
+     * Poll the walk switch
+     * @return true if the walk switch is enabled
+     */
     public boolean walkEnabled() {
         return walkButton.isChecked();
     }
 
+    /**
+     * Poll the sound button
+     * @return true if the sound is enabled (switch not activated)
+     */
     public boolean soundEnabled(){return !sound.isChecked();}
 
+    /**
+     * poll the sound button for presses
+     * @return true if the button is pressed
+     */
     public boolean soundPressed(){
         return sound.isPressed();
     }
 
+    /**
+     * @return Hud stage
+     */
     public Stage getStage() {
         return stage;
     }
