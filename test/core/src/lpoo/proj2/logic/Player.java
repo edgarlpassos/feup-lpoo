@@ -70,7 +70,7 @@ public class Player extends Sprite {
         //Initial status
         facingRight = true;
         currentState = State.IDLE;
-        previousState = State.IDLE;
+        previousState = null;
         yVel = 0;
         maxyVel = 0;
         prevyVel = 0;
@@ -193,7 +193,7 @@ public class Player extends Sprite {
         cshape.setAsBox(18 / 2 * 2.5f / lpooGame.PPM, 40 / 2 * 2.5f / lpooGame.PPM);//(40/2) / lpooGame.PPM,(40/2)/lpooGame.PPM);
 
         fdef.shape = cshape;
-        fdef.friction = 50f / lpooGame.PPM;
+        fdef.friction = 0.7f;
         body.createFixture(fdef).setUserData("player");
     }
 
@@ -246,17 +246,21 @@ public class Player extends Sprite {
                 break;
 
             case STOP:
-                if (stop_run.isAnimationFinished(elapsedTime)) {
+                if (stop_run.isAnimationFinished(elapsedTime) ) {
                 }
-                //body.setLinearVelocity(0, 0);
-                else body.applyForceToCenter(direction * -400f / lpooGame.PPM, 0, true);
+                else body.applyForceToCenter(-2body.getLinearVelocity().x * stop_run.getAnimationDuration() * lpooGame.PPM, 0, true);
                 break;
 
             case RUN_JUMP:
-                if (elapsedTime >= 0.9) {
-                    body.applyForceToCenter(direction * -1000 / lpooGame.PPM, 0, true);
-                } else
+                if(elapsedTime < 0.3)
+                    body.applyForceToCenter(direction * 500f / lpooGame.PPM, 750f / lpooGame.PPM, true);
+
+                else if (elapsedTime >= 0.3 && elapsedTime < 0.9) {
                     body.applyForceToCenter(direction * 700f / lpooGame.PPM, 750f / lpooGame.PPM, true);
+                }
+
+                else
+                    body.applyForceToCenter(direction * -6 * 700f / lpooGame.PPM, -6 * 750f / lpooGame.PPM, true);
                 break;
 
             case WALKING:
@@ -273,7 +277,6 @@ public class Player extends Sprite {
                 break;
 
             case IDLE:
-
                 break;
 
             case TURNING_RUN:
@@ -295,14 +298,6 @@ public class Player extends Sprite {
                 body.applyForceToCenter(0, -2 * world.getGravity().y, true);
                 break;
         }
-
-        if (body.getLinearVelocity().isZero(0.5f)) {
-            if ((currentState == State.STOP && stop_run.isAnimationFinished(elapsedTime)) || currentState == State.TURNING && turn.isAnimationFinished(elapsedTime)) {
-                //body.setLinearVelocity(0, 0);
-                changeState(State.IDLE);
-            }
-        }
-
     }
 
     public void run() {
@@ -332,21 +327,18 @@ public class Player extends Sprite {
                 if (elapsedTime >= 0.6f) {
                     setCurrentAnimation(stop_run);
                     changeState(State.STOP);
-                    //body.setLinearVelocity(0,0);
                 }
                 break;
 
             case RUNNING:
                 setCurrentAnimation(stop_run);
                 changeState(State.STOP);
-                //body.setLinearVelocity(0,0);
                 break;
 
             case RUN_JUMP:
-                if (running_jump.isAnimationFinished(elapsedTime)) {
+                if (elapsedTime >= 0.9) {
                     setCurrentAnimation(stop_run);
                     changeState(State.STOP);
-                    //body.setLinearVelocity(0, 0);
                 }
                 break;
 
@@ -366,15 +358,9 @@ public class Player extends Sprite {
                 break;
 
             case HANGING:
-                body.applyForceToCenter(0, -1 * world.getGravity().y, true);
                 break;
 
             case CLIMBING_UP:
-                if (climb_up.isAnimationFinished(elapsedTime)) {
-                    body.setTransform(getX() + getWidth() / 2, getY() + getHeight(), 0);
-                    changeState(State.IDLE);
-                    setCurrentAnimation(idle);
-                }
                 break;
 
             default:
