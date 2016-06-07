@@ -104,8 +104,11 @@ public class Player {
     public static final float STOP_TIME = 0.6f;
     public static final float TURNING_TIME = 0.6f;
     public static final float WALK_TIME = 0.7f;
-    public static final float CLIMB_UP_TIME = 1f;
+    public static final float CLIMB_UP_TIME = 1f/2;
     public static final float CLIMB_JUMP_TIME = 1.1f;
+
+    public boolean moving;
+    public boolean walking;
 //    public static final float
 
     /**
@@ -126,7 +129,9 @@ public class Player {
         maxyVel = 0;
         prevyVel = 0;
         elapsedTime = 0;
-        playerSprite = null;
+        playerSprite = null;run();
+        moving = false;
+        walking = false;
     }
 
     /**
@@ -144,7 +149,7 @@ public class Player {
 
         FixtureDef fdef = new FixtureDef();
         PolygonShape cshape = new PolygonShape();
-        cshape.setAsBox(18 / 2 * 2.5f / lpooGame.PPM, 40 / 2 * 2.5f / lpooGame.PPM);//(40/2) / lpooGame.PPM,(40/2)/lpooGame.PPM);
+        cshape.setAsBox(18 / 2 * 2.5f / lpooGame.PPM, (40 / 2) * 2.5f / lpooGame.PPM);//(40/2) / lpooGame.PPM,(40/2)/lpooGame.PPM);
 
         fdef.shape = cshape;
         fdef.friction = 0.7f;
@@ -167,6 +172,13 @@ public class Player {
         int direction = facingRight ? 1 : -1;
         elapsedTime+=dt;
         playerSprite.update(dt);
+
+        if(moving){
+         if(walking)
+             walk();
+         else run();
+        }
+        else stop();
 
 
         prevyVel = yVel;
@@ -258,7 +270,7 @@ public class Player {
 
             case CLIMB_JUMP:
                 if (elapsedTime >= 0.7 && elapsedTime <= 0.8f)
-                    body.applyForceToCenter(0, 4200f / lpooGame.PPM, true);
+                    body.applyForceToCenter(0, 4500f / lpooGame.PPM, true);
                 break;
 
             case HANGING:
@@ -267,8 +279,6 @@ public class Player {
 
             case CLIMBING_UP:
                 body.applyForceToCenter(0, -2 * world.getGravity().y, true);
-                if(elapsedTime > CLIMB_UP_TIME)
-                    stop();
                 break;
 
             case FALLING:
@@ -462,25 +472,15 @@ public class Player {
         }
     }
 
-    /**
-     * Used to make the player climb ledges, goes into a jumping animation if the player was on the ground, and into a climbing up animation if the player was hanging
-     */
-    public void climb() {
-        if (currentState == State.IDLE ) {
-            changeState(State.CLIMB_JUMP);
-        }
-
-        if (currentState == State.HANGING) {
-            changeState(State.CLIMBING_UP);
-        }
-    }
 
     /**
      * Used to snap the player to a ledge and trigger a hanging animation, is called by the contact with a Climbable Tilemap tile
      */
     public void hang() {
+        System.out.println("HANG");
         if (currentState != State.HANGING && previousState != State.HANGING) {
             changeState(State.HANGING);
+            body.setLinearVelocity(0,0);
         }
     }
 
@@ -572,5 +572,4 @@ public class Player {
         if (playerSprite != null)
             playerSprite.draw(batch);
     }
-
 }

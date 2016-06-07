@@ -253,7 +253,7 @@ public class GameScreen extends MyScreen {
     @Override
     public void render(float delta){
         rend.render();
-        //b2dr.render(world,cam.combined); TODO remove
+        b2dr.render(world,cam.combined); //TODO remove
 
         update(delta);
         game.batch.setProjectionMatrix(vport.getCamera().combined);
@@ -290,7 +290,6 @@ public class GameScreen extends MyScreen {
     }
 
     public void update(float delta) {
-        handleInput();
         hud.update();
 
         if(player.hasKey() && key.getBody() != null){
@@ -307,89 +306,6 @@ public class GameScreen extends MyScreen {
         rend.setView(cam);
         player.update(delta);
         world.step(1 / 60f, 6, 2);
-    }
-
-    public void handleInput() {
-
-        if(hud.soundPressed()){
-            toggleMusic();
-        }
-
-        //Walking animations
-        if (hud.walkEnabled()) {
-
-            if (hud.pressedRight()) {
-                if (player.isFacingRight()) {
-                    if (hud.pressedA()) {   //long jump
-                        player.jump();
-                        return;
-                    }
-                    else player.walk();
-                    return;
-                }
-                //facing left, turn around
-                else player.turn();
-                return;
-            }
-            else if (hud.pressedLeft()) {
-                if (!player.isFacingRight()) {
-                    if (hud.pressedA()) {   //long jump
-                        player.jump();
-                    }
-                    else player.walk();
-                    return;
-                //facing right, turn around
-                } else player.turn();
-                return;
-
-            } else if (hud.pressedA()) {   //long jump
-                player.jump();
-                return;
-            } else player.stop();
-            return;
-
-        //Running animations
-        } else {
-            if (hud.pressedRight()) {
-                if(player.isFacingRight()){
-                    if(hud.pressedA()) {
-                        player.jump();
-                        return;
-                    }else player.run();
-                //facing left, turn  around
-                } else {
-                    player.turn();
-                    return;
-                }
-            }
-
-            else if(hud.pressedLeft()){
-                if(!player.isFacingRight()) {
-                    if (hud.pressedA()) {
-                        player.jump();
-                        return;
-                    }
-                    else player.run();
-                    return;
-                }
-                //facing right, turn around
-                else {
-                    player.turn();
-                    return;
-                }
-
-            }
-
-            else if(hud.pressedA()){
-                player.jump();
-                return;
-            }
-
-            else player.stop();
-            return;
-        }
-
-
     }
 
     public TextureAtlas getTextures() {
@@ -424,5 +340,9 @@ public class GameScreen extends MyScreen {
 
     public OrthographicCamera getCam(){
         return cam;
+    }
+
+    public void handleInput(){
+
     }
 }

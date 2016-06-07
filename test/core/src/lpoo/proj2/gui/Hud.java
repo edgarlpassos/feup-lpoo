@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -87,7 +88,7 @@ public class Hud {
         this.screen = screen;
         viewport = new FitViewport(lpooGame.WIDTH/2, lpooGame.HEIGHT/2, new OrthographicCamera());
         stage = new Stage(viewport, batch);
-        Gdx.input.setInputProcessor(stage);
+
 
         Table table = new Table();
         table.setFillParent(true);
@@ -105,12 +106,11 @@ public class Hud {
         TextureRegionDrawable right = new TextureRegionDrawable(new TextureRegion(new Texture("gui/right.png")));
         TextureRegionDrawable rightPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/right_pressed.png")));
 
-        TextureRegionDrawable walk = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk.png")));
+        final TextureRegionDrawable walk = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk.png")));
         TextureRegionDrawable walkPressed = new TextureRegionDrawable(new TextureRegion(new Texture("gui/walk_pressed.png")));
 
         TextureRegionDrawable soundOn = new TextureRegionDrawable(new TextureRegion(new Texture("gui/volume_on.png")));
         TextureRegionDrawable soundOff = new TextureRegionDrawable(new TextureRegion(new Texture("gui/volume_off.png")));
-
 
 
 
@@ -120,6 +120,68 @@ public class Hud {
         rightButton = new ImageButton(right, rightPressed);
         walkButton = new ImageButton(walk, walkPressed, walkPressed);
         sound = new ImageButton(soundOn,soundOff,soundOff);
+
+        InputListener leftListener = new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println("DSfadf");
+                if(!screen.player.isFacingRight())
+                    screen.player.moving = true;
+                else screen.player.turn();
+
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                screen.player.moving = false;
+            }
+        };
+
+        InputListener rightListener = new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(screen.player.isFacingRight())
+                    screen.player.moving = true;
+                else screen.player.turn();
+
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                screen.player.moving = false;
+            }
+        };
+
+        InputListener btnAListener = new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                screen.player.jump();
+            }
+        };
+
+        InputListener musicBtnListener = new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                screen.toggleMusic();
+            }
+        };
+
+        leftButton.addListener(leftListener);
+        rightButton.addListener(rightListener);
+        buttonA.addListener(btnAListener);
+        sound.addListener(musicBtnListener);
 
         //placing the buttons
         table.setDebug(false);
@@ -136,6 +198,7 @@ public class Hud {
         table.add(buttonB).size(40,40);
 
         stage.addActor(table);
+        Gdx.input.setInputProcessor(stage);
     }
 
     /**
@@ -143,6 +206,9 @@ public class Hud {
      */
     public void update() {
         stage.act();
+        if(walkEnabled())
+            screen.player.walking = true;
+        else screen.player.walking = false;
     }
 
     /**

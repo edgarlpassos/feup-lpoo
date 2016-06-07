@@ -285,10 +285,10 @@ public class PlayerSprite extends Sprite {
 
         }
 
-        if (currentAnimation == climb_up) {
-            setBounds((player.body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (player.body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (currentAnimation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (currentAnimation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
+        /*if (currentAnimation == climb_up) {
+            setBounds((player.body.getPosition().x + getWidth() / 2f) , (player.body.getPosition().y + getHeight() / 2f), (currentAnimation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (currentAnimation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
         } else
-            setBounds((player.body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (player.body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (currentAnimation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (currentAnimation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
+            setBounds((player.body.getPosition().x + getWidth() / 2f) , (player.body.getPosition().y + getHeight() / 2f) , (currentAnimation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (currentAnimation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);*/
     }
 
 
@@ -318,6 +318,8 @@ public class PlayerSprite extends Sprite {
             return flipped;
         }
 
+
+
         return frame;
 
 
@@ -326,12 +328,17 @@ public class PlayerSprite extends Sprite {
     public void update (float dt){
 
         //Sets the new position of the player sprite to follow the box2d body
-        if (currentAnimation == climb_up) {
+       /* if (currentAnimation == climb_up) {
             setPosition(player.isFacingRight() ? (player.body.getPosition().x) : player.body.getPosition().x - getWidth(), (player.body.getPosition().y - getHeight() / 4));
         } else
-            setPosition((player.body.getPosition().x - getWidth() / 2), (player.body.getPosition().y - getHeight() / 2));
+            setPosition((player.body.getPosition().x - getWidth() / 2), (player.body.getPosition().y - getHeight() / 2));*/
 
         setRegion(getFrame(dt));
+
+        if (currentAnimation == climb_up) {
+            setBounds((player.body.getPosition().x - getWidth()/2) , (player.body.getPosition().y  - getHeight()/4), (currentAnimation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (currentAnimation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
+        } else
+            setBounds((player.body.getPosition().x - getWidth() / 2f) , (player.body.getPosition().y - getHeight() / 2f) , (currentAnimation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (currentAnimation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
 
         //Checks if the player has left the view of the camera and, if so, snaps it to a new position
         if (player.body.getPosition().y < screen.getCam().position.y - screen.getCam().viewportHeight / 2) {
