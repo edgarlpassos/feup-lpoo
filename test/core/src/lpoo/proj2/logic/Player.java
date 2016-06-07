@@ -144,7 +144,7 @@ public class Player {
     public void definePlayer() {
         BodyDef bdef = new BodyDef();
         bdef.position.set((lpooGame.WIDTH*6f+20)/lpooGame.PPM, (700*2f + 450) / lpooGame.PPM);
-        bdef.position.set(400 / lpooGame.PPM, (lpooGame.HEIGHT + 450) / lpooGame.PPM);
+        //bdef.position.set(400 / lpooGame.PPM, (lpooGame.HEIGHT + 450) / lpooGame.PPM);
 
         bdef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bdef);
