@@ -72,7 +72,7 @@ public class GameScreen extends MyScreen {
         lpooGame.music.stop();
         lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/game_music.mp3"));
         lpooGame.music.play();
-        lpooGame.music.setLooping(true);
+        //lpooGame.music.setLooping(true);
 
 
 
