@@ -53,6 +53,7 @@ public class Player extends Sprite {
     //Logic variables
     private boolean alive;
     private boolean hasKey;
+    private boolean escaped;
 
     public Player(GameScreen screen) {
         super(screen.getTextures().findRegion("playersprites"));
@@ -60,6 +61,7 @@ public class Player extends Sprite {
         this.screen = screen;
         alive = true;
         hasKey = false;
+        escaped = false;
         definePlayer();
 
         //Initial status
@@ -272,7 +274,7 @@ public class Player extends Sprite {
             }
         }
 
-        System.out.println(currentState);
+        //System.out.println(currentState);
     }
 
     public void run() {
@@ -464,6 +466,7 @@ public class Player extends Sprite {
     public boolean isAlive(){
         return alive;
     }
+    public boolean asEscaped(){return escaped;}
 
     public void isKilled(){
         alive = false;
@@ -482,7 +485,8 @@ public class Player extends Sprite {
 
     public void checkExit(){
         if(hasKey){
-            //TODO WIN GAME
+            escaped = true;
+            //TODO WIN GAME ANIMATION / CALL WIN MENU
         }
     }
     public World getWorld(){
@@ -499,8 +503,8 @@ public class Player extends Sprite {
         currentAnimation = animation;
         if(animation == climb_up) {
             setBounds((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);
-            System.out.println((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM);
-            System.out.println((body.getPosition().y + getHeight() / 2f) / lpooGame.PPM);
+            //System.out.println((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM);
+            //System.out.println((body.getPosition().y + getHeight() / 2f) / lpooGame.PPM);
         }
         else
             setBounds((body.getPosition().x + getWidth() / 2f) / lpooGame.PPM, (body.getPosition().y + getHeight() / 2f) / lpooGame.PPM, (animation.getKeyFrame(0).getRegionWidth()) * 2.5f / lpooGame.PPM, (animation.getKeyFrame(0).getRegionHeight()) * 2.5f / lpooGame.PPM);

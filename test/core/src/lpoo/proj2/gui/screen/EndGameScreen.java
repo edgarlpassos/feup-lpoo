@@ -1,8 +1,6 @@
 package lpoo.proj2.gui.screen;
 
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -19,34 +17,31 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-
 import lpoo.proj2.logic.states.GameState;
 import lpoo.proj2.lpooGame;
 
 /**
- * Created by epassos on 6/4/16.
+ * Created by amelo on 6/7/16.
  */
-public class MainMenuScreen extends  MyScreen{
+public class EndGameScreen extends  MyScreen{
 
-    private Texture background;
-    private SpriteBatch batch;
-    private Label title;
-    private Label subtitle;
-    private Button playButton;
-    private Button exitButton;
-    private Stage stage;
+
     private Viewport viewport;
     private OrthographicCamera cam;
+    private Stage stage;
+    private Texture background;
+    private SpriteBatch batch;
 
-    public MainMenuScreen(lpooGame game){
+    private Button playAgainButton;
+    private Button exitButton;
+    private Label menssage;
+
+    private boolean win;
+
+    public EndGameScreen(lpooGame game,boolean win) {
         super(game);
 
-        //lpooGame.music.stop();
-        lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/star_wars.mp3"));
-        lpooGame.music.play();
-        lpooGame.music.setLooping(true);
-
-        background = new Texture("gui/mainmenu_background.jpg");
+        this.win = win;
         batch = new SpriteBatch();
 
         cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
@@ -64,28 +59,61 @@ public class MainMenuScreen extends  MyScreen{
         Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont,Color.GOLD);
 
 
-        playButton = new TextButton("PLAY",style);
-        exitButton = new TextButton("exit",style);
-        title = new Label("STAR WARS",titleStyle);
-        subtitle = new Label("inside THE DEATH STAR",titleStyle);
+        if(win){
+            lpooGame.music.stop();
+            lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/maytheforcebewithyou.mp3"));
+            lpooGame.music.play();
+            lpooGame.music.setLooping(true);
+
+            background = new Texture("gui/win.jpg");
+            menssage = new Label("win",titleStyle);
+        }else{
+            lpooGame.music.stop();
+            lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/burn.mp3"));
+            lpooGame.music.play();
+            lpooGame.music.setLooping(true);
+
+            background = new Texture("gui/lose.jpg");
+            menssage = new Label("lose",titleStyle);
+        }
+
+
+        playAgainButton = new TextButton("PLAY AGAIN",style);
+        exitButton = new TextButton("BACK",style);
 
 
         Table table = new Table();
         table.setFillParent(true);
         table.setDebug(false);
-        table.add(title).expandX().align(Align.center).colspan(3);
-        table.row();
-        table.add(subtitle).align(Align.center).expand().colspan(3);
+        table.add(menssage).expandX().align(Align.center).colspan(3);
         table.row();
         table.add(exitButton).align(Align.center);
         table.add();
-        table.add(playButton).align(Align.center);
+        table.add(playAgainButton).align(Align.center);
 
         stage.addActor(table);
     }
 
     @Override
+    public void update(float delta) {
+        handleInput();
+        stage.act();
+    }
+
+    @Override
+    public void handleInput() {
+        if(playAgainButton.isPressed()){
+            game.gsm.set(new GameState(new GameScreen(game),game.gsm));
+        }
+
+        if(exitButton.isPressed()){
+            game.gsm.set(new GameState(new MainMenuScreen(game),game.gsm));
+        }
+    }
+
+    @Override
     public void show() {
+
     }
 
     @Override
@@ -98,7 +126,6 @@ public class MainMenuScreen extends  MyScreen{
 
         game.batch.setProjectionMatrix(stage.getCamera().combined);
         stage.draw();
-
     }
 
     @Override
@@ -123,22 +150,6 @@ public class MainMenuScreen extends  MyScreen{
 
     @Override
     public void dispose() {
-    }
 
-    @Override
-    public void update(float delta) {
-        handleInput();
-        stage.act();
-    }
-
-    @Override
-    public void handleInput() {
-        if(playButton.isPressed()){
-            game.gsm.push(new GameState(new GameScreen(game),game.gsm));
-        }
-
-        if(exitButton.isPressed()){
-            Gdx.app.exit();
-        }
     }
 }

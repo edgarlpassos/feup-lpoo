@@ -80,13 +80,13 @@ public class Hud {
         table.row();
         table.add().expandY();
         table.row();
-        table.add(leftButton).size(40,40);
-        table.add(rightButton).size(40,40).align(Align.left);
+        table.add(leftButton).size(60,60);
+        table.add(rightButton).size(60,60).align(Align.left);
         table.add().expandX();
-        table.add(walkButton).size(40,40);//.align(Align.right);
+        table.add(walkButton).size(60,60);//.align(Align.right);
 
-        table.add(buttonA).size(40,40);
-        table.add(buttonB).size(40,40);
+        table.add(buttonA).size(60,60);
+        table.add(buttonB).size(60,60);
 
         stage.addActor(table);
     }

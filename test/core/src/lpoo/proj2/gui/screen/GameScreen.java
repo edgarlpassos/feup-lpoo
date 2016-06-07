@@ -31,6 +31,7 @@ import lpoo.proj2.gui.Hud;
 import lpoo.proj2.logic.Player;
 import lpoo.proj2.logic.WorldContactListener;
 import lpoo.proj2.logic.Key;
+import lpoo.proj2.logic.states.GameState;
 
 
 /**
@@ -71,6 +72,7 @@ public class GameScreen extends MyScreen {
         lpooGame.music.stop();
         lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/game_music.mp3"));
         lpooGame.music.play();
+        lpooGame.music.setLooping(true);
 
 
 
@@ -222,6 +224,10 @@ public class GameScreen extends MyScreen {
         handleInput();
         hud.update(delta);
 
+        if(player.asEscaped()){
+            game.gsm.set(new GameState(new EndGameScreen(game,true),game.gsm));
+        }
+
         if(player.hasKey() && key.getBody() != null){
             world.destroyBody(key.getBody());
             key.getCell().setTile(null);
@@ -229,7 +235,7 @@ public class GameScreen extends MyScreen {
         }
 
         if(!player.isAlive()){
-            game.gsm.pop();
+            game.gsm.set(new GameState(new EndGameScreen(game,false),game.gsm));
         }
 
         cam.update();
