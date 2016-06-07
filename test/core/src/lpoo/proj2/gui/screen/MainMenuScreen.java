@@ -32,8 +32,11 @@ public class MainMenuScreen extends  MyScreen{
     private SpriteBatch batch;
     private Label title;
     private Label subtitle;
+
     private Button playButton;
     private Button exitButton;
+    private Button highScores;
+
     private Stage stage;
     private Viewport viewport;
     private OrthographicCamera cam;
@@ -66,6 +69,7 @@ public class MainMenuScreen extends  MyScreen{
 
         playButton = new TextButton("PLAY",style);
         exitButton = new TextButton("exit",style);
+        highScores = new TextButton("highscores",style);
         title = new Label("STAR WARS",titleStyle);
         subtitle = new Label("inside THE DEATH STAR",titleStyle);
 
@@ -78,7 +82,7 @@ public class MainMenuScreen extends  MyScreen{
         table.add(subtitle).align(Align.center).expand().colspan(3);
         table.row();
         table.add(exitButton).align(Align.center);
-        table.add();
+        table.add(highScores).align(Align.center);
         table.add(playButton).align(Align.center);
 
         stage.addActor(table);
@@ -127,6 +131,7 @@ public class MainMenuScreen extends  MyScreen{
 
     @Override
     public void update(float delta) {
+        Gdx.input.setInputProcessor(stage);
         handleInput();
         stage.act();
     }
@@ -134,11 +139,15 @@ public class MainMenuScreen extends  MyScreen{
     @Override
     public void handleInput() {
         if(playButton.isPressed()){
-            game.gsm.push(new GameState(new GameScreen(game),game.gsm));
+            game.gsm.set(new GameState(new GameScreen(game),game.gsm));
         }
 
         if(exitButton.isPressed()){
             Gdx.app.exit();
+        }
+
+        if(highScores.isPressed()){
+            game.gsm.set(new GameState(new HighScoresScreen(game),game.gsm));
         }
     }
 }

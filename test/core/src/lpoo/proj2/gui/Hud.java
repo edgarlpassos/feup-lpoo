@@ -103,7 +103,7 @@ public class Hud {
     public void update(float delta) {
         stage.act();
     }
-    public boolean pressedPause(){return pauseButton.isChecked();}
+    public boolean pressedPause(){return pauseButton.isPressed();}
 
     public boolean pressedA() {
         return buttonA.isPressed();

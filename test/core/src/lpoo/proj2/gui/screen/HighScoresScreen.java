@@ -23,7 +23,7 @@ import lpoo.proj2.lpooGame;
 /**
  * Created by amelo on 6/7/16.
  */
-public class Pause extends MyScreen{
+public class HighScoresScreen extends MyScreen{
 
     private Viewport viewport;
     private OrthographicCamera cam;
@@ -31,24 +31,23 @@ public class Pause extends MyScreen{
     private Texture background;
     private SpriteBatch batch;
 
-
-    private Button playAgainButton;
     private Button exitButton;
     private Label menssage;
+    private Label score_menssage1;
+    private Label score_menssage2;
+    private Label score_menssage3;
 
 
-
-    public Pause(lpooGame game) {
+    public HighScoresScreen(lpooGame game) {
         super(game);
 
         batch = new SpriteBatch();
-
         cam = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         viewport = new FitViewport(lpooGame.WIDTH,lpooGame.HEIGHT,cam);
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        background = new Texture("gui/pause_background.jpg");
+        background = new Texture("gui/highscores_background.jpg");
 
         BitmapFont font = new BitmapFont(Gdx.files.internal("font.fnt"),false);
         font.setColor(Color.BLACK);
@@ -59,20 +58,25 @@ public class Pause extends MyScreen{
         BitmapFont titleFont = new BitmapFont(Gdx.files.internal("font_title.fnt"),false);
         Label.LabelStyle titleStyle = new Label.LabelStyle(titleFont,Color.GOLD);
 
-
-        playAgainButton = new TextButton("resume",style);
         exitButton = new TextButton("BACK",style);
-        menssage = new Label("game paused",titleStyle);
+        menssage = new Label("high scores",titleStyle);
+        score_menssage1 = new Label(Float.toString(lpooGame.scores[2]),titleStyle);
+        score_menssage2 = new Label(Float.toString(lpooGame.scores[1]),titleStyle);
+        score_menssage3 = new Label(Float.toString(lpooGame.scores[0]),titleStyle);
 
 
         Table table = new Table();
         table.setFillParent(true);
         table.setDebug(false);
-        table.add(menssage).expandX().align(Align.center).colspan(3);
+        table.add(menssage).expandX().align(Align.center).colspan(1);
         table.row();
-        table.add(exitButton).align(Align.center);
-        table.add();
-        table.add(playAgainButton).align(Align.center);
+        table.add(score_menssage1).expandX().align(Align.center).expandY();
+        table.row();
+        table.add(score_menssage2).expandX().align(Align.center).expandY();
+        table.row();
+        table.add(score_menssage3).expandX().align(Align.center).expandY();
+        table.row().expandY();
+        table.add(exitButton).align(Align.center).align(Align.bottom);
 
         stage.addActor(table);
 
@@ -86,15 +90,10 @@ public class Pause extends MyScreen{
 
     @Override
     public void handleInput() {
-        if(playAgainButton.isPressed()){
-            game.gsm.pop();
-            //game.gsm.pop();
-        }
 
         if(exitButton.isPressed()){
             game.gsm.set(new GameState(new MainMenuScreen(game),game.gsm));
         }
-
     }
 
     @Override

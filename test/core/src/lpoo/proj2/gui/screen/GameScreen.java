@@ -1,16 +1,11 @@
 package lpoo.proj2.gui.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -20,11 +15,10 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import java.lang.Math;
 
 import lpoo.proj2.*;
 import lpoo.proj2.gui.Hud;
@@ -51,8 +45,6 @@ public class GameScreen extends MyScreen {
     private TextureAtlas textures;
     private Hud hud;
 
-
-
     public enum Switch {UP, DOWN, LEFT, RIGHT};
 
     //Map variables
@@ -65,6 +57,8 @@ public class GameScreen extends MyScreen {
     //Player
     public Player player;
     private Key key;
+    public TimeUtils timer;
+    public long score_time;
 
 
     public GameScreen(lpooGame game) {
@@ -85,6 +79,9 @@ public class GameScreen extends MyScreen {
         key = null;
         world.setContactListener(new WorldContactListener(player));
         loadmap();
+        score_time = timer.millis();
+
+
     }
 
     public void loadmap(){
@@ -182,6 +179,7 @@ public class GameScreen extends MyScreen {
 
     @Override
     public void render(float delta){
+        Gdx.app.log("Render", "GameState");
         rend.render();
         //b2dr.render(world,cam.combined);
 
@@ -224,6 +222,8 @@ public class GameScreen extends MyScreen {
         hud.update(delta);
 
         if(player.asEscaped()){
+            score_time = timer.timeSinceMillis(score_time);
+            lpooGame.insertScore(score_time/(10*10*10));
             game.gsm.set(new GameState(new EndGameScreen(game,true),game.gsm));
         }
 
@@ -244,8 +244,9 @@ public class GameScreen extends MyScreen {
     }
 
     public void handleInput() {
-
+        Gdx.input.setInputProcessor(hud.stage);
         if(hud.pressedPause()){
+            hud.getStage().act();
             game.gsm.push(new GameState(new Pause(game),game.gsm));
         }
 
