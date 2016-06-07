@@ -1,14 +1,17 @@
 package lpoo.proj2.gui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -34,6 +37,7 @@ public class Hud {
     private Button leftButton;
     private Button rightButton;
     private Button sound;
+    private Button pauseButton;
 
     public Hud(SpriteBatch batch, final GameScreen screen) {
 
@@ -64,6 +68,9 @@ public class Hud {
         TextureRegionDrawable soundOn = new TextureRegionDrawable(new TextureRegion(new Texture("gui/volume_on.png")));
         TextureRegionDrawable soundOff = new TextureRegionDrawable(new TextureRegion(new Texture("gui/volume_off.png")));
 
+        //pause
+        TextureRegionDrawable pause = new TextureRegionDrawable(new TextureRegion(new Texture("gui/pause.png")));
+
 
 
 
@@ -73,9 +80,11 @@ public class Hud {
         rightButton = new ImageButton(right, rightPressed);
         walkButton = new ImageButton(walk, walkPressed, walkPressed);
         sound = new ImageButton(soundOn,soundOff,soundOff);
+        pauseButton = new ImageButton(pause,pause,pause);
 
         //placing the buttons
         table.setDebug(false);
+        table.add(pauseButton).align(Align.left).size(40,40);
         table.add(sound).expandX().align(Align.right).size(40,40).colspan(6);
         table.row();
         table.add().expandY();
@@ -94,6 +103,7 @@ public class Hud {
     public void update(float delta) {
         stage.act();
     }
+    public boolean pressedPause(){return pauseButton.isChecked();}
 
     public boolean pressedA() {
         return buttonA.isPressed();

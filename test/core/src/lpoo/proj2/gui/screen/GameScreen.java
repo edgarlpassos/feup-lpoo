@@ -72,7 +72,6 @@ public class GameScreen extends MyScreen {
         lpooGame.music.stop();
         lpooGame.music = Gdx.audio.newMusic(Gdx.files.internal("music/game_music.mp3"));
         lpooGame.music.play();
-        //lpooGame.music.setLooping(true);
 
 
 
@@ -245,6 +244,11 @@ public class GameScreen extends MyScreen {
     }
 
     public void handleInput() {
+
+        if(hud.pressedPause()){
+            game.gsm.push(new GameState(new Pause(game),game.gsm));
+        }
+
 
         //Walking animations
         if (hud.walkEnabled()) {

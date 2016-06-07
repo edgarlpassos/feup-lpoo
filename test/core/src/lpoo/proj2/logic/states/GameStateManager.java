@@ -8,7 +8,7 @@ import java.util.Stack;
  */
 public class GameStateManager {
 
-    Stack<GameState> states;
+    private Stack<GameState> states;
 
     public GameStateManager(){
         states = new Stack<GameState>();
@@ -27,7 +27,7 @@ public class GameStateManager {
     }
 
     public void set(GameState state){
-        pop();
-        push(state);
+        states.pop();
+        states.push(state);
     }
 }
