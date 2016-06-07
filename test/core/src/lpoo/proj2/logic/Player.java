@@ -205,16 +205,23 @@ public class Player extends Sprite {
         yVel = body.getLinearVelocity().y;
         maxyVel = yVel > maxyVel ? yVel : maxyVel;
 
-        if (yVel < -3f && currentState != State.FALLING) {
+        if (yVel < -3f && currentState != State.FALLING && currentState != State.LONG_JUMP) {
             changeState(State.FALLING);
             setCurrentAnimation(falling);
         }
 
-        if(yVel == 0 && prevyVel != 0){
+        else if (yVel < -4f && currentState != State.FALLING ) {
+            changeState(State.FALLING);
+            setCurrentAnimation(falling);
+        }
+
+        if(yVel == 0f && currentState == State.FALLING){
             if(prevyVel > 10){
                 setCurrentAnimation(fall_death);
                 isKilled();
             }
+
+            else stop();
         }
         if (currentAnimation == climb_up) {
             setPosition(facingRight ? (body.getPosition().x) : body.getPosition().x - getWidth(), (body.getPosition().y - getHeight() / 4));
@@ -248,7 +255,7 @@ public class Player extends Sprite {
             case STOP:
                 if (stop_run.isAnimationFinished(elapsedTime) ) {
                 }
-                else body.applyForceToCenter(-2body.getLinearVelocity().x * stop_run.getAnimationDuration() * lpooGame.PPM, 0, true);
+                else body.applyForceToCenter(-body.getLinearVelocity().x * stop_run.getAnimationDuration() * lpooGame.PPM, 0, true);
                 break;
 
             case RUN_JUMP:
@@ -272,8 +279,10 @@ public class Player extends Sprite {
             case LONG_JUMP:
                 if (elapsedTime <= 0.4f) {
                 } else if (elapsedTime >= 0.8f) {
-                    body.applyForceToCenter(direction * -500f / lpooGame.PPM, 0, true);
-                } else body.applyForceToCenter(direction * 1500f / lpooGame.PPM, 0f, true);
+                    body.applyForceToCenter(direction * -1750f / lpooGame.PPM, -1000f / lpooGame.PPM, true);
+                } else body.applyForceToCenter(direction * 2500f / lpooGame.PPM, 1000f / lpooGame.PPM, true);
+                if(long_jump.isAnimationFinished(elapsedTime))
+                    stop();
                 break;
 
             case IDLE:
@@ -298,6 +307,8 @@ public class Player extends Sprite {
                 body.applyForceToCenter(0, -2 * world.getGravity().y, true);
                 break;
         }
+
+        System.out.println(currentState);
     }
 
     public void run() {
@@ -344,8 +355,8 @@ public class Player extends Sprite {
 
             case LONG_JUMP:
                 if (long_jump.isAnimationFinished(elapsedTime)) {
-                    setCurrentAnimation(idle);
-                    changeState(State.IDLE);
+                    setCurrentAnimation(stop_run);
+                    changeState(State.STOP);
                 }
                 break;
 
@@ -358,9 +369,15 @@ public class Player extends Sprite {
                 break;
 
             case HANGING:
+                body.applyForceToCenter(0,-1 * world.getGravity().y,true);
                 break;
 
             case CLIMBING_UP:
+                if(climb_up.isAnimationFinished(elapsedTime)){
+                    body.setTransform(getX()+getWidth()/2,getY()+getHeight(),0);
+                    changeState(State.IDLE);
+                    setCurrentAnimation(idle);
+                }
                 break;
 
             default:
