@@ -24,6 +24,13 @@ public class UnitTesting {
         //Inicial state
         assertEquals(player.getCurrentState(),Player.State.IDLE);
 
+        //Start Running state
+        player.run();
+        assertEquals(player.getCurrentState(),Player.State.START_RUN);
 
+        //Running
+        player.elapsedTime = 5f;
+        player.run();
+        assertEquals(player.getCurrentState(),Player.State.RUNNING);
     }
 }

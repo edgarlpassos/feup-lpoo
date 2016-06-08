@@ -47,7 +47,7 @@ public class Player {
     /**
      * Time spent in the current state
      */
-    private float elapsedTime;
+    public float elapsedTime;
 
     /**
      * Current player state
