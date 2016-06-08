@@ -1,12 +1,13 @@
-import com.badlogic.gdx.Game;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import lpoo.proj2.gui.screen.GameScreen;
+import lpoo.proj2.logic.Player;
 import lpoo.proj2.lpooGame;
-
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import lpoo.proj2.logic.Player;
 
 /**
  * Created by epassos on 6/7/16.
@@ -15,16 +16,14 @@ import static org.junit.Assert.assertTrue;
 @RunWith(GdxTestRunner.class)
 public class UnitTesting {
 
-    lpooGame game;
-    GameScreen screen;
-
-    public UnitTesting(lpooGame game){
-        this.game = game;
-        screen = new GameScreen(game,"Map/Test_map.tmx");
-    }
 
     @Test
-    public void testTest() {
-        assertTrue(true);
+    public void PlayerStateTest() {
+        Player player = new Player();
+
+        //Inicial state
+        assertEquals(player.getCurrentState(),Player.State.IDLE);
+
+
     }
 }

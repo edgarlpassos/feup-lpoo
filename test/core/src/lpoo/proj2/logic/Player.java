@@ -27,7 +27,7 @@ public class Player {
 
     public enum State {
         IDLE, START_RUN, RUNNING, STOP, TURNING, TURNING_RUN, RUN_JUMP, LONG_JUMP, FALLING,
-        WALKING, DEAD, ATTACKING, DEFENDING, DRAW_SWORD, SHEATHE_SWORD, SWORD_IDLE, DRINKING, HANGING, CLIMB_JUMP, CLIMBING_UP, DROP, ESCAPING
+        WALKING, DEAD, HANGING, CLIMB_JUMP, CLIMBING_UP
     }
 
 
@@ -131,7 +131,7 @@ public class Player {
         maxyVel = 0;
         prevyVel = 0;
         elapsedTime = 0;
-        playerSprite = null;run();
+        playerSprite = null;//run();
         moving = false;
         walking = false;
     }
@@ -143,7 +143,7 @@ public class Player {
      */
     public void definePlayer() {
         BodyDef bdef = new BodyDef();
-        bdef.position.set((lpooGame.WIDTH*6f+20)/lpooGame.PPM, (700*2f + 450) / lpooGame.PPM);
+        bdef.position.set((lpooGame.WIDTH*6f+8*75)/lpooGame.PPM, (700*2f + 8*75) / lpooGame.PPM);
         //bdef.position.set(400 / lpooGame.PPM, (lpooGame.HEIGHT + 450) / lpooGame.PPM);
 
         bdef.type = BodyDef.BodyType.DynamicBody;
@@ -421,7 +421,7 @@ public class Player {
             changeState(State.CLIMBING_UP);
         }
 
-        System.out.println("Jump animation");
+        //System.out.println("Jump animation");
     }
 
     /**
@@ -477,7 +477,7 @@ public class Player {
      * Used to snap the player to a ledge and trigger a hanging animation, is called by the contact with a Climbable Tilemap tile
      */
     public void hang() {
-        System.out.println("HANG");
+        //System.out.println("HANG");
         if (currentState != State.HANGING && previousState != State.HANGING) {
             changeState(State.HANGING);
             body.setLinearVelocity(0,0);
