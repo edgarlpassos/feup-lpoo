@@ -17,8 +17,13 @@ import lpoo.proj2.logic.states.GameStateManager;
  */
 public class lpooGame extends Game {
 
-
+    /**
+     * WIDTH used in the game
+     */
     public static final int WIDTH = 1400;
+    /**
+     * HEIGHT used in the game
+     */
     public static final int HEIGHT = 700;
 
     /**
@@ -27,12 +32,30 @@ public class lpooGame extends Game {
      */
     public static final float PPM = 70;
 
+    /**
+     * SpriteBatch
+     */
     public SpriteBatch batch;
+    /**
+     * GameStateManager
+     */
     public GameStateManager gsm;
+    /**
+     * Game music
+     */
     public static Music music = null;
+    /**
+     * Scores
+     */
     public static float[] scores;
+    /**
+     * Preferences
+     */
     public static Preferences pref;
 
+    /**
+     * Create game
+     */
     @Override
     public void create() {
         batch = new SpriteBatch();
@@ -51,6 +74,9 @@ public class lpooGame extends Game {
         gsm.push(main_menu);    //Starts game with main menu
     }
 
+    /**
+     * Render game
+     */
     @Override
     public void render() {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -58,6 +84,9 @@ public class lpooGame extends Game {
         gsm.render(Gdx.graphics.getDeltaTime());
     }
 
+    /**
+     * Set initial scores
+     */
     public static void inicialScores(){
         for(int i= 0;i < scores.length; i++){
             scores[i] = 0f;
@@ -67,12 +96,18 @@ public class lpooGame extends Game {
         pref.flush();
     }
 
+    /**
+     * Load scores
+     */
     public static void loadScores(){
         for(int i= 0;i < scores.length; i++){
             scores[i] = pref.getFloat("number"+i);
         }
     }
 
+    /**
+     * Save scores
+     */
     public static void saveScores(){
         for(int i= 0;i < scores.length; i++) {
             pref.putFloat("number" + i, scores[i]);
@@ -80,6 +115,10 @@ public class lpooGame extends Game {
         pref.flush();
     }
 
+    /**
+     * Insert a scores
+     * @param score
+     */
     public static void insertScore(float score){
         if(score < scores[0] || scores[0] == 0f){
             if(score < scores[1] || scores[1] == 0f){

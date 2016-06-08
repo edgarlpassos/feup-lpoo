@@ -9,15 +9,26 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 
 
 /**
- * Created by Antonio Melo and Edgar Passos
+ * World contact listener
  */
 public class WorldContactListener implements ContactListener {
+    /**
+     * Player
+     */
     private Player p;
 
+    /**
+     * WorldContactListener constructor
+     * @param p Player
+     */
     public WorldContactListener(Player p) {
         this.p = p;
     }
 
+    /**
+     * Checks player contact with other objects
+     * @param contact
+     */
     @Override
     public void beginContact(Contact contact) {
         Fixture fixA = contact.getFixtureA();
@@ -45,16 +56,30 @@ public class WorldContactListener implements ContactListener {
         }
     }
 
+    /**
+     * EndContact
+     * @param contact
+     */
     @Override
     public void endContact(Contact contact) {
 
     }
 
+    /**
+     * PreSolve
+     * @param contact
+     * @param oldManifold
+     */
     @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
 
     }
 
+    /**
+     * PostSolve
+     * @param contact
+     * @param impulse
+     */
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
 

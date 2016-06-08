@@ -264,7 +264,7 @@ public class GameScreen extends MyScreen {
 
         Gdx.app.log("Render", "GameState");
         rend.render();
-        b2dr.render(world,cam.combined); //TODO remove
+        //b2dr.render(world,cam.combined); //TODO remove
 
         update(delta);
         game.batch.setProjectionMatrix(vport.getCamera().combined);

@@ -217,7 +217,7 @@ public class Hud {
         table.add(walkButton).size(60,60);//.align(Align.right);
 
         table.add(buttonA).size(60,60);
-        table.add(buttonB).size(60,60);
+        //table.add(buttonB).size(60,60);
 
         stage.addActor(table);
         Gdx.input.setInputProcessor(stage);

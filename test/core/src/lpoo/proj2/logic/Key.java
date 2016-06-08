@@ -8,14 +8,24 @@ import lpoo.proj2.gui.screen.GameScreen;
 
 
 /**
- * Created by Antonio on 06-Jun-16.
+ * Represents a key in the game
  */
 public class Key {
 
+    /**
+     * Body Key
+     */
     private Body body;
+    /**
+     *  GameScreen key is in
+     */
     private GameScreen screen;
 
-
+    /**
+     * Key constructor
+     * @param body of the key
+     * @param screen key is in
+     */
     public Key(Body body, GameScreen screen) {
         this.body = body;
         this.screen = screen;
