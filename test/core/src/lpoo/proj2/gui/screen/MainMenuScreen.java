@@ -161,6 +161,9 @@ public class MainMenuScreen extends  MyScreen{
 
     @Override
     public void dispose() {
+        background.dispose();
+        batch.dispose();
+        stage.dispose();
     }
 
     @Override

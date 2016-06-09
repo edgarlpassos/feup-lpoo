@@ -32,5 +32,10 @@ public class UnitTesting {
         player.elapsedTime = 5f;
         player.run();
         assertEquals(player.getCurrentState(),Player.State.RUNNING);
+
+        //Stop running
+        player.elapsedTime = 7f;
+        player.stop();
+        assertEquals(player.getCurrentState(),Player.State.STOP);
     }
 }

@@ -303,17 +303,12 @@ public class Player {
             if (elapsedTime >= 0.6f) {
                 changeState(State.RUNNING);
             }
-        } else if (currentState == State.RUN_JUMP) { //Can be called for the jumps
-            if (elapsedTime > 0.9f) {
-                changeState(State.RUNNING);
-            }
-        } else if (currentState == State.LONG_JUMP) {
+        } else if (currentState == State.RUN_JUMP || currentState == State.LONG_JUMP) { //Can be called for the jumps
             if (elapsedTime > 0.9f) {
                 changeState(State.RUNNING);
             }
         }
     }
-
 
     /**
      * Handles a stop in motion, acts according to the player state, with a running stop if the player was in quick motion, and a simple change
@@ -573,5 +568,10 @@ public class Player {
     public void draw(SpriteBatch batch){
         if (playerSprite != null)
             playerSprite.draw(batch);
+    }
+
+    public void dispose(){
+        world.dispose();
+        playerSprite.dispose();
     }
 }

@@ -43,4 +43,8 @@ public class Key {
         TiledMapTileLayer layer = (TiledMapTileLayer) screen.getMap().getLayers().get(2);
         return layer.getCell((int)(body.getPosition().x),(int)(body.getPosition().y));
     }
+
+    public void dispose(){
+        screen.dispose();
+    }
 }

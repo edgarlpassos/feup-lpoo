@@ -355,5 +355,9 @@ public class PlayerSprite extends Sprite {
         }
     }
 
+    public void dispose() {
+        screen.dispose();
+    }
+
 
 }

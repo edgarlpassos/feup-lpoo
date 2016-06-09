@@ -294,4 +294,9 @@ public class Hud {
     public Stage getStage() {
         return stage;
     }
+
+    public void dispose() {
+        stage.dispose();
+        screen.dispose();
+    }
 }

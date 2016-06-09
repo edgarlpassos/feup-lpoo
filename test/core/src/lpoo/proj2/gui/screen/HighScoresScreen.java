@@ -135,7 +135,8 @@ public class HighScoresScreen extends MyScreen{
 
     @Override
     public void dispose() {
-        stage.dispose();
         background.dispose();
+        batch.dispose();
+        stage.dispose();
     }
 }

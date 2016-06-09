@@ -50,4 +50,7 @@ public class GameStateManager {
         states.pop();
         states.push(state);
     }
+
+    public void dispose(){
+    }
 }

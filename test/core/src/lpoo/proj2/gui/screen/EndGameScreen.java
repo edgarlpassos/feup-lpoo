@@ -150,6 +150,8 @@ public class EndGameScreen extends  MyScreen{
 
     @Override
     public void dispose() {
-
+        background.dispose();
+        batch.dispose();
+        stage.dispose();
     }
 }

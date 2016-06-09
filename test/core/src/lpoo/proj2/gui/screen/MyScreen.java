@@ -41,4 +41,8 @@ public abstract class MyScreen implements Screen{
     public lpooGame getGame(){
         return game;
     }
+
+    public void dispose() {
+        game.dispose();
+    }
 }

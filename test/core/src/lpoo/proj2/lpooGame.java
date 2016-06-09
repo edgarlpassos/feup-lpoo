@@ -135,4 +135,10 @@ public class lpooGame extends Game {
         }
         saveScores();
     }
+
+    public void dispose(){
+        batch.dispose();
+        gsm.dispose();
+        music.dispose();
+    }
 }

@@ -297,7 +297,11 @@ public class GameScreen extends MyScreen {
 
     @Override
     public void dispose() {
-        //// TODO: 6/7/16
+        textures.dispose();
+        map.dispose();
+        rend.dispose();
+        b2dr.dispose();
+        world.dispose();
     }
 
     public void update(float delta) {
